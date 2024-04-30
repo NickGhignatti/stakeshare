@@ -1,0 +1,38 @@
+{
+  "canisters": {
+    "icrc7_backend": {
+      "candid": "src/icrc7_backend/icrc7_backend.did",
+      "package": "icrc7_backend",
+      "type": "rust"
+    },
+    "icrc7_frontend": {
+      "dependencies": [
+        "icrc7_backend"
+      ],
+      "source": [
+        "src/icrc7_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "icrc7_frontend"
+    },
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
