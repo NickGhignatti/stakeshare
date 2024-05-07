@@ -7,7 +7,7 @@ mv target/wasm32-unknown-unknown/release/icrc7.wasm wasm_files
 gzip wasm_files/icrc7.wasm
 
 cargo build --target wasm32-unknown-unknown --release --package icrc7_backend
-candid-extractor target/wasm32-unknown-unknown/release/icrc7_backend.wasm > icrc7_backend/icrc7_backend.did || true
+candid-extractor target/wasm32-unknown-unknown/release/icrc7_backend.wasm > src/icrc7_backend/icrc7_backend.did || true
 
 cargo build --target wasm32-unknown-unknown --release --package factory
 candid-extractor target/wasm32-unknown-unknown/release/factory.wasm > src/factory/factory.did || true
