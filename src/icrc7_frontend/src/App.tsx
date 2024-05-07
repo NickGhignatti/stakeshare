@@ -5,6 +5,7 @@ import { _SERVICE as _FCTRY_SERVICE, Arg } from '../../declarations/factory/fact
 import { _SERVICE as _BCKND_SERVICE } from '../../declarations/icrc7_backend/icrc7_backend.did';
 import { idlFactory as FactoryIdlFactory } from '../candid/factory';
 import { idlFactory as BackendIdlFactory } from '../candid/backend';
+import { isSafari } from 'react-device-detect';
 
 const authClient = await AuthClient.create();
 
@@ -12,9 +13,18 @@ function App() {
   const [greeting, setGreeting] = useState('');
   const webapp_id = process.env.CANISTER_ID_FACTORY;
   const backend_webapp_id = process.env.CANISTER_ID_ICRC7_BACKEND;
-  const nft_webapp_id = process.env.CANISTER_ID_NFT_BACKEND;
-  const local_iiUrl1 = `http://127.0.0.1:4943/?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}`;
-  const local_iiUrl2 = `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943/`;
+  const local_iiUrl = isSafari ? 
+  `http://127.0.0.1:4943/?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}` : 
+  `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943/`;
+
+  let iiUrl = local_iiUrl;
+  if (process.env.DFX_NETWORK === "local") {
+    iiUrl = local_iiUrl;
+  } else if (process.env.DFX_NETWORK === "ic") {
+    iiUrl = `https://${process.env.CANISTER_ID_INTERNET_IDENTITY}.ic0.app`;
+  } else {
+    iiUrl = local_iiUrl;
+  }
 
   // At this point we're authenticated, and we can get the identity from the auth client:
   const identity = authClient.getIdentity();
@@ -25,7 +35,6 @@ function App() {
     agent,
     canisterId: webapp_id!,
   });
-
   const backend_webapp: _BCKND_SERVICE = Actor.createActor(BackendIdlFactory, {
     agent, 
     canisterId: backend_webapp_id!,
@@ -35,7 +44,7 @@ function App() {
     authClient.isAuthenticated().then(async isAuth => {
         await new Promise<void>((resolve, reject) => {
           authClient.login({
-            identityProvider: local_iiUrl2,
+            identityProvider: iiUrl,
             onSuccess: resolve,
             onError: reject,
           });
