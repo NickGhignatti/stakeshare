@@ -17,6 +17,6 @@ type Result = variant { Ok : principal; Err : text };
 service : {
   call_whoami : () -> (vec text);
   mint_collection_canister : (Arg) -> (Result);
-  show_collections : () -> (vec record { text; text }) query;
+  show_collections : () -> (vec record { principal; principal }) query;
   whoami : (principal) -> (text) query;
 }

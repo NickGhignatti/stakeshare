@@ -1,0 +1,8 @@
+type Group = record { group_members : vec Member; group_name : text };
+type Member = record { name : text; internet_identity : principal };
+service : {
+  call_canister_whoami : (principal) -> (text);
+  get_group_members : (text) -> (vec Member) query;
+  subscribe_group : (Group) -> ();
+  whoami : () -> (principal) query;
+}
