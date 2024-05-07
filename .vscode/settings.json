@@ -2,6 +2,7 @@
     "conventionalCommits.scopes": [
         "icrc7",
         "dfx_compile",
-        "api"
+        "api",
+        "structure"
     ]
 }

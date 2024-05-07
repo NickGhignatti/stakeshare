@@ -6,7 +6,6 @@ use crate::{icrc7_types::Transaction, state::STATE, Icrc7TokenMetadata, Standard
 
 #[ic_cdk::query]
 pub fn whoami() -> String {
-    ic_cdk::println!("Caller of ICRC7 canister = {}", caller());
     caller().to_string()
 }
 

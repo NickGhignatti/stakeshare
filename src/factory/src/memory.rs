@@ -16,8 +16,19 @@ thread_local! {
     });
 }
 
-pub fn get_collections() -> HashMap<String, String> {
-    COLLECTIONS.with(|collection| collection.borrow().iter().collect())
+pub fn get_collections() -> HashMap<Principal, Principal> {
+    COLLECTIONS.with(|collection| {
+        collection
+            .borrow()
+            .iter()
+            .map(|(k, v)| {
+                (
+                    Principal::from_text(k).unwrap(),
+                    Principal::from_text(v).unwrap(),
+                )
+            })
+            .collect()
+    })
 }
 
 pub fn insert_collection(canister_id: Principal, owner: Principal) {

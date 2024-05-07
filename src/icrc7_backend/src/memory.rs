@@ -4,7 +4,7 @@ use ic_stable_structures::DefaultMemoryImpl;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use crate::structures::Group;
+use crate::common::types::Group;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
