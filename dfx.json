@@ -1,13 +1,18 @@
 {
   "canisters": {
+    "factory": {
+      "candid": "src/factory/factory.did",
+      "package": "factory",
+      "type": "rust"
+    },
     "icrc7_backend": {
-      "candid": "src/icrc7_backend/icrc7_backend.did",
+      "candid": "src/icrc7_bakend/icrc7_backend.did",
       "package": "icrc7_backend",
       "type": "rust"
     },
     "icrc7_frontend": {
       "dependencies": [
-        "icrc7_backend"
+        "factory"
       ],
       "source": [
         "src/icrc7_frontend/dist"

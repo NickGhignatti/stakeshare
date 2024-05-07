@@ -5,7 +5,7 @@
         "experimentalDecorators": true,
         "strictPropertyInitialization": false,
         "moduleResolution": "node",
-        "allowJs": true,
+        "allowJs": false,
         "outDir": "HACK_BECAUSE_OF_ALLOW_JS"
     }
 }

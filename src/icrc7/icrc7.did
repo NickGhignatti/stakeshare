@@ -1,0 +1,208 @@
+type Account = record { owner : principal; subaccount : opt blob };
+type ApprovalArg = record {
+  token_id : nat;
+  memo : opt blob;
+  from_subaccount : opt blob;
+  expires_at : opt nat64;
+  spender : Account;
+};
+type ApprovalError = variant {
+  GenericError : record { message : text; error_code : nat };
+  TemporaryUnavailable;
+  InvalidSpender;
+  NonExistingTokenId;
+  Unauthorized : record { tokens_ids : vec nat };
+  GenericBatchError : record { message : text; error_code : nat };
+  TooOld;
+};
+type BurnArg = record {
+  token_id : nat;
+  memo : opt blob;
+  from_subaccount : opt blob;
+};
+type BurnError = variant {
+  GenericError : record { message : text; error_code : nat };
+  NonExistingTokenId;
+  Unauthorized;
+  GenericBatchError : record { message : text; error_code : nat };
+};
+type ExtAllowanceArg = record {
+  token : text;
+  owner : User;
+  spender : principal;
+};
+type ExtAllowanceResult = variant { ok : nat; err : ExtCommonError };
+type ExtApproveArg = record {
+  token : text;
+  subaccount : opt blob;
+  allowance : nat;
+  spender : principal;
+};
+type ExtBalanceArg = record { token : text; user : User };
+type ExtBalanceResult = variant { ok : nat; err : ExtCommonError };
+type ExtBearerResult = variant { ok : text; err : ExtCommonError };
+type ExtCommonError = variant { InvalidToken : text; Other : text };
+type ExtFungibleMetadataType = record {
+  decimals : nat8;
+  metadata : opt blob;
+  name : text;
+  symbol : text;
+};
+type ExtMetadata = variant {
+  fungible : ExtFungibleMetadataType;
+  nonfungible : ExtMetadataType;
+};
+type ExtMetadataResult = variant { ok : ExtMetadata; err : ExtCommonError };
+type ExtMetadataType = record { metadata : opt blob };
+type ExtMintArg = record { to : User; metadata : opt blob };
+type ExtSupplyResult = variant { ok : nat; err : ExtCommonError };
+type ExtTransferArg = record {
+  to : User;
+  token : text;
+  notify : bool;
+  from : User;
+  memo : blob;
+  subaccount : opt blob;
+  amount : nat;
+};
+type ExtTransferError = variant {
+  CannotNotify : text;
+  InsufficientBalance;
+  InvalidToken : text;
+  Rejected;
+  Unauthorized : text;
+  Other : text;
+};
+type ExtTransferResult = variant { ok : nat; err : ExtTransferError };
+type InitArg = record {
+  icrc7_supply_cap : opt nat;
+  icrc7_description : opt text;
+  tx_window : opt nat64;
+  minting_account : opt Account;
+  icrc7_max_query_batch_size : opt nat;
+  permitted_drift : opt nat64;
+  icrc7_max_take_value : opt nat;
+  icrc7_max_memo_size : opt nat;
+  icrc7_symbol : text;
+  icrc7_max_update_batch_size : opt nat;
+  icrc7_atomic_batch_transfers : opt bool;
+  icrc7_default_take_value : opt nat;
+  icrc7_logo : opt text;
+  icrc7_name : text;
+};
+type InsertTransactionError = variant {
+  RemoteError;
+  NotSetArchiveCanister;
+  InvalidId;
+  SyncPending;
+  CantWrite;
+  Unexpected : text;
+};
+type MetadataValue = variant { Int : int; Nat : nat; Blob : blob; Text : text };
+type MintArg = record {
+  to : Account;
+  token_id : nat;
+  memo : opt blob;
+  from_subaccount : opt blob;
+  token_description : opt text;
+  token_logo : opt text;
+  token_name : opt text;
+};
+type MintError = variant {
+  GenericError : record { message : text; error_code : nat };
+  SupplyCapReached;
+  TokenIdMinimumLimit;
+  Unauthorized;
+  GenericBatchError : record { message : text; error_code : nat };
+  TokenIdAlreadyExist;
+};
+type Result = variant { Ok : nat; Err : ApprovalError };
+type Result_1 = variant { Ok : nat32; Err : InsertTransactionError };
+type Result_2 = variant { Ok : nat; Err : BurnError };
+type Result_3 = variant { Ok : nat; Err : MintError };
+type Result_4 = variant { Ok : nat; Err : TransferError };
+type Standard = record { url : text; name : text };
+type Transaction = record {
+  at : nat64;
+  op : text;
+  memo : opt blob;
+  txn_type : TransactionType;
+  txn_id : nat;
+};
+type TransactionType = variant {
+  Burn : record { to : Account; tid : nat; from : Account };
+  Mint : record { to : Account; tid : nat; from : Account };
+  Approval : record { to : Account; tid : nat; from : Account };
+  Transfer : record { to : Account; tid : nat; from : Account };
+};
+type TransferArg = record {
+  to : Account;
+  token_id : nat;
+  memo : opt blob;
+  from_subaccount : opt blob;
+  created_at_time : opt nat64;
+};
+type TransferError = variant {
+  GenericError : record { message : text; error_code : nat };
+  Duplicate : record { duplicate_of : nat };
+  NonExistingTokenId;
+  Unauthorized;
+  CreatedInFuture : record { ledger_time : nat64 };
+  InvalidRecipient;
+  GenericBatchError : record { message : text; error_code : nat };
+  TooOld;
+};
+type User = variant { "principal" : principal; address : text };
+type WalletReceiveResult = record { accepted : nat64 };
+service : (InitArg) -> {
+  allowance : (ExtAllowanceArg) -> (ExtAllowanceResult) query;
+  approve : (ExtApproveArg) -> (bool);
+  balance : (ExtBalanceArg) -> (ExtBalanceResult) query;
+  batchMintNFT : (vec ExtMintArg) -> (vec nat32);
+  bearer : (text) -> (ExtBearerResult) query;
+  extensions : () -> (vec text) query;
+  getMinter : () -> (principal) query;
+  getRegistry : () -> (vec record { nat32; text }) query;
+  getTokenIdentifier : (nat) -> (text) query;
+  getTokens : () -> (vec record { nat32; ExtMetadata }) query;
+  getTokensByIds : (vec nat32) -> (vec record { nat32; ExtMetadata }) query;
+  icrc7_approve : (vec ApprovalArg) -> (vec opt Result);
+  icrc7_archive_log_canister : () -> (opt principal) query;
+  icrc7_archive_logs : () -> (Result_1);
+  icrc7_atomic_batch_transfers : () -> (opt bool) query;
+  icrc7_balance_of : (vec Account) -> (vec nat) query;
+  icrc7_burn : (vec BurnArg) -> (vec opt Result_2);
+  icrc7_default_take_value : () -> (opt nat) query;
+  icrc7_description : () -> (opt text) query;
+  icrc7_logo : () -> (opt text) query;
+  icrc7_max_memo_size : () -> (opt nat) query;
+  icrc7_max_query_batch_size : () -> (opt nat) query;
+  icrc7_max_take_value : () -> (opt nat) query;
+  icrc7_max_update_batch_size : () -> (opt nat) query;
+  icrc7_mint : (MintArg) -> (Result_3);
+  icrc7_minting_authority : () -> (opt Account) query;
+  icrc7_name : () -> (text) query;
+  icrc7_owner_of : (vec nat) -> (vec opt Account) query;
+  icrc7_set_archive_log_canister : (principal) -> (bool);
+  icrc7_set_minting_authority : (Account) -> (bool);
+  icrc7_supply_cap : () -> (opt nat) query;
+  icrc7_supported_standards : () -> (vec Standard) query;
+  icrc7_symbol : () -> (text) query;
+  icrc7_token_metadata : (vec nat) -> (
+      vec opt vec record { text; MetadataValue },
+    ) query;
+  icrc7_tokens : (opt nat, opt nat) -> (vec nat) query;
+  icrc7_tokens_of : (Account, opt nat, opt nat) -> (vec nat) query;
+  icrc7_total_supply : () -> (nat) query;
+  icrc7_transfer : (vec TransferArg) -> (vec opt Result_4);
+  icrc7_txn_logs : (nat32, nat32) -> (vec Transaction) query;
+  metadata : (text) -> (ExtMetadataResult) query;
+  mintNFT : (ExtMintArg) -> (nat32);
+  setAccountMapping : () -> (opt text);
+  supply : (text) -> (ExtSupplyResult) query;
+  transfer : (ExtTransferArg) -> (ExtTransferResult);
+  updateMetadata : (text, text) -> (bool);
+  wallet_balance : () -> (nat) query;
+  wallet_receive : () -> (WalletReceiveResult);
+  whoami : () -> (text) query;
+}

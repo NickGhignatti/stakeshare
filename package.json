@@ -14,5 +14,8 @@
   "type": "module",
   "workspaces": [
     "src/icrc7_frontend"
-  ]
+  ],
+  "dependencies": {
+    "@dfinity/auth-client": "^1.2.1"
+  }
 }

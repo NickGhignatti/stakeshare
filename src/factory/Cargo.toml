@@ -1,5 +1,5 @@
 [package]
-name = "icrc7_backend"
+name = "factory"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,4 +15,3 @@ ic-cdk-macros = "0.8.0"
 icrc-ledger-types = "0.1.1"
 serde = { version = "1.0.188", features = ["derive"] }
 ic-stable-structures = "0.6.4"
-serde_json = "=1.0.1"
