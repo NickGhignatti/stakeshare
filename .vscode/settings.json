@@ -3,6 +3,7 @@
         "icrc7",
         "dfx_compile",
         "api",
-        "structure"
+        "structure",
+        "frontend"
     ]
 }
