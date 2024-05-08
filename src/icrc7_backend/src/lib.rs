@@ -38,9 +38,16 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
         .collect::<HashMap<Principal, Principal>>()
 }
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn remove_group(group_id: String) {
     remove_entry(group_id);
+}
+
+#[ic_cdk::update(guard = "not_anonymous_caller")]
+pub fn remove_all_groups() {
+    for (k, _) in get_collections() {
+        remove_entry(k);
+    }
 }
 
 #[ic_cdk::query(guard = "not_anonymous_caller")]
