@@ -11,3 +11,6 @@ candid-extractor target/wasm32-unknown-unknown/release/icrc7_backend.wasm > src/
 
 cargo build --target wasm32-unknown-unknown --release --package factory
 candid-extractor target/wasm32-unknown-unknown/release/factory.wasm > src/factory/factory.did || true
+
+cp src/decalrations/factory/factory.did.js src/icrc7_frontend/candid/factory.tsx
+cp src/decalrations/icrc7_backend/icrc7_backend.did.js src/icrc7_frontend/candid/backend.tsx
