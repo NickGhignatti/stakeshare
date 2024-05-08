@@ -21,6 +21,23 @@ pub async fn subscribe_group(group: Group) {
     }
 }
 
+#[ic_cdk::update(guard = "not_anonymous_caller")]
+pub async fn get_user_collections() -> HashMap<Principal, Principal> {
+    let caller = ic_cdk::caller();
+    let factory_canister_id =
+        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
+    let (all_collections,): (HashMap<Principal, Principal>,) =
+        match call(factory_canister_id, "show_collections", ()).await {
+            Ok(map) => map,
+            _ => (HashMap::new(),),
+        };
+    all_collections
+        .iter()
+        .filter(|(_k, v)| *v.to_string() == *caller.to_string())
+        .map(|(k, v)| (k.clone(), v.clone()))
+        .collect::<HashMap<Principal, Principal>>()
+}
+
 #[ic_cdk::update]
 pub fn remove_group(group_id: String) {
     remove_entry(group_id);

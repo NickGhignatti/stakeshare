@@ -18,8 +18,16 @@ pub async fn assign_nft_to_group_member(uuid: String) -> Result<String, String> 
     let factory_canister_id =
         Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
     for member in group.group_members.clone() {
-        let icrc7_canister_id =
-            create_icrc7_collection(member.internet_identity.clone(), factory_canister_id).await;
+        let icrc7_name = format!(
+            "Commemorative NFT for {} to join {} group!",
+            member.name, group.group_name
+        );
+        let icrc7_canister_id = create_icrc7_collection(
+            member.internet_identity.clone(),
+            factory_canister_id,
+            icrc7_name,
+        )
+        .await;
         // updating minting authority, default is on the factory canister
         update_minting_authority(
             factory_canister_id,
@@ -53,14 +61,18 @@ async fn update_minting_authority(
     is_up
 }
 
-async fn create_icrc7_collection(owner: Principal, factory_id: Principal) -> Principal {
+async fn create_icrc7_collection(
+    owner: Principal,
+    factory_id: Principal,
+    icrc7_name: String,
+) -> Principal {
     let (result,): (Result<Principal, String>,) = call(
         factory_id,
         "mint_collection_canister",
         (
             Arg {
-                icrc7_symbol: format!("ICRC7 Collection symbol of {}", owner),
-                icrc7_name: format!("ICRC7 Collection name of {}", owner),
+                icrc7_symbol: format!("ICP"),
+                icrc7_name: icrc7_name,
                 icrc7_description: None,
                 icrc7_logo: None,
                 icrc7_supply_cap: None,
