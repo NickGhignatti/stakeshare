@@ -10,8 +10,8 @@ use crate::{
 use icrc_ledger_types::icrc1::account::Account;
 
 #[ic_cdk::update]
-pub fn icrc7_mint(arg: MintArg) -> MintResult {
-    let caller = ic_cdk::caller();
+pub fn icrc7_mint(arg: MintArg, caller: Principal) -> MintResult {
+    // let caller = ic_cdk::caller();
     if caller == Principal::anonymous() {
         return Err(crate::errors::MintError::GenericBatchError {
             error_code: 100,

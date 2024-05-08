@@ -4,6 +4,7 @@
         "dfx_compile",
         "api",
         "structure",
-        "frontend"
+        "frontend",
+        "backend"
     ]
 }

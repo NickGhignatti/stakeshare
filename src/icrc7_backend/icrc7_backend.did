@@ -3,6 +3,8 @@ type Member = record { name : text; internet_identity : principal };
 service : {
   call_canister_whoami : (principal) -> (text);
   get_group_members : (text) -> (vec Member) query;
+  print_groups : () -> (vec record { text; Group }) query;
+  remove_group : (text) -> ();
   subscribe_group : (Group) -> ();
   whoami : () -> (principal) query;
 }

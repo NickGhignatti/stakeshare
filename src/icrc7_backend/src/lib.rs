@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 use candid::Principal;
-use common::{guards::not_anonymous_caller, uuid::uuidv4};
+use common::{functions::assign_nft_to_group_member, guards::not_anonymous_caller, uuid::uuidv4};
 use ic_cdk::call;
 use ic_cdk_macros::export_candid;
 
@@ -7,11 +9,26 @@ pub mod common;
 pub mod memory;
 
 use common::types::{Group, Member};
-use memory::{get_collections, insert_collection};
+use memory::{get_collections, insert_collection, remove_entry};
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub fn subscribe_group(group: Group) {
-    insert_collection(uuidv4(), group);
+pub async fn subscribe_group(group: Group) {
+    let group_id = uuidv4();
+    insert_collection(group_id.clone(), group);
+    match assign_nft_to_group_member(group_id).await {
+        Ok(v) => ic_cdk::println!("{}", v),
+        Err(e) => ic_cdk::println!("{}", e),
+    }
+}
+
+#[ic_cdk::update]
+pub fn remove_group(group_id: String) {
+    remove_entry(group_id);
+}
+
+#[ic_cdk::query(guard = "not_anonymous_caller")]
+pub fn print_groups() -> HashMap<String, Group> {
+    get_collections()
 }
 
 #[ic_cdk::query(guard = "not_anonymous_caller")]

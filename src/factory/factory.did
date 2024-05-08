@@ -1,3 +1,4 @@
+type Account = record { owner : principal; subaccount : opt blob };
 type Arg = record {
   icrc7_supply_cap : opt nat;
   icrc7_description : opt text;
@@ -15,8 +16,8 @@ type Arg = record {
 };
 type Result = variant { Ok : principal; Err : text };
 service : {
-  call_whoami : () -> (vec text);
-  mint_collection_canister : (Arg) -> (Result);
+  mint_collection_canister : (Arg, Account) -> (Result);
   show_collections : () -> (vec record { principal; principal }) query;
+  update_minting_aythority : (principal, principal) -> (bool);
   whoami : (principal) -> (text) query;
 }

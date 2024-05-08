@@ -24,3 +24,7 @@ pub fn get_collections() -> HashMap<String, Group> {
 pub fn insert_collection(group_id: String, group: Group) {
     COLLECTIONS.with(|collection| collection.borrow_mut().insert(group_id, group));
 }
+
+pub fn remove_entry(group_id: String) {
+    COLLECTIONS.with(|collection| collection.borrow_mut().remove(&group_id));
+}
