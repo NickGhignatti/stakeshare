@@ -1,5 +1,3 @@
-use std::env;
-
 use candid::Principal;
 use ic_cdk::call;
 use icrc_ledger_types::icrc1::account::Account;
@@ -22,7 +20,8 @@ pub async fn assign_nft_to_group_member(uuid: String) -> Result<String, String> 
     for member in group.group_members.clone() {
         let icrc7_canister_id =
             create_icrc7_collection(member.internet_identity.clone(), factory_canister_id).await;
-        let is_up = update_minting_authority(
+        // updating minting authority, default is on the factory canister
+        update_minting_authority(
             factory_canister_id,
             member.internet_identity.clone(),
             icrc7_canister_id,
@@ -94,12 +93,6 @@ async fn mint_icrc7_for_user(owner: Principal, icrc7_canister_id: Principal) -> 
         owner: owner,
         subaccount: None,
     };
-    let (minting_auth,): (Option<Account>,) =
-        call(icrc7_canister_id, "icrc7_minting_authority", ())
-            .await
-            .unwrap();
-    ic_cdk::println!("Owner = {}", owner);
-    ic_cdk::println!("Minting auth = {}", minting_auth.unwrap().owner);
     let (result,): (MintResult,) = call(
         icrc7_canister_id,
         "icrc7_mint",
