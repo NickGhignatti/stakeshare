@@ -5,6 +5,7 @@
         "api",
         "structure",
         "frontend",
-        "backend"
+        "backend",
+        "memory"
     ]
 }

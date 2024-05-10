@@ -46,6 +46,35 @@ pub struct Account {
     pub subaccount: Option<Subaccount>,
 }
 
+#[derive(Serialize, CandidType, Deserialize, Clone)]
+pub struct Event {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+}
+
+impl Storable for Event {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(
+            serde_json::to_string(self)
+                .expect("failed to serialize to bytes")
+                .as_bytes()
+                .to_vec(),
+        )
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        let from_str = serde_json::from_str(
+            String::from_utf8(bytes.to_vec())
+                .expect("failed to serialize from bytes")
+                .as_str(),
+        );
+        from_str.expect("failed to serialize from bytes")
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
 #[derive(CandidType, Deserialize, Clone)]
 pub struct MintArg {
     pub from_subaccount: Option<Subaccount>,
