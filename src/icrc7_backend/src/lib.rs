@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 use candid::Principal;
-use common::{functions::assign_nft_to_group_member, guards::not_anonymous_caller, uuid::uuidv4};
+use common::{
+    group_functions::assign_nft_to_group_member, guards::not_anonymous_caller, uuid::uuidv4,
+};
 use ic_cdk::call;
 use ic_cdk_macros::export_candid;
 
