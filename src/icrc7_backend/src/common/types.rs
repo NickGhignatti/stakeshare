@@ -140,7 +140,11 @@ pub enum MintError {
 }
 
 #[derive(CandidType, Clone, Debug)]
-pub enum OperationError {
-    RetrieveError { error_code: u16, message: String },
-    InsertError { error_code: u16, message: String },
+pub enum OperationCode {
+    MintOk { code: u16, message: String },
+    RemoveOk { code: u16, message: String },
+    RetrieveError { code: u16, message: String },
+    InsertError { code: u16, message: String },
+    DuplicateEntry { code: u16, message: String },
+    MintingError { code: u16, message: String },
 }

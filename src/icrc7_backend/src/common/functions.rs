@@ -1,7 +1,7 @@
 use candid::Principal;
 use ic_cdk::call;
 
-use crate::memory::{get_current_token_id, increase_token_id};
+use crate::memory::{get_collections, get_current_token_id, increase_token_id};
 
 use super::types::{Account, Arg, MintArg, MintResult, TransferArg, TransferResult};
 
@@ -90,4 +90,12 @@ pub async fn transfer(collection_id: Principal, args: Vec<TransferArg>, caller: 
         call(collection_id, "icrc7_transfer", (args, caller))
             .await
             .unwrap();
+}
+
+pub fn group_already_present(name: String) -> bool {
+    get_collections()
+        .iter()
+        .filter(|(_k, v)| v.group_name.clone() == name)
+        .count()
+        > 0
 }

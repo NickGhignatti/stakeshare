@@ -5,7 +5,7 @@ use ic_stable_structures::DefaultMemoryImpl;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use crate::common::types::{Event, Group};
+use crate::common::types::{Event, Group, OperationCode};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -34,8 +34,18 @@ pub fn insert_collection(group_id: String, group: Group) {
     COLLECTIONS.with(|collection| collection.borrow_mut().insert(group_id, group));
 }
 
-pub fn remove_entry(group_id: String) {
-    COLLECTIONS.with(|collection| collection.borrow_mut().remove(&group_id));
+pub fn remove_entry(group_id: &String) {
+    COLLECTIONS.with(|collection| collection.borrow_mut().remove(group_id));
+}
+
+pub fn get_group_by_id(group_id: String) -> Result<Group, OperationCode> {
+    match COLLECTIONS.with(|collection| collection.borrow().get(&group_id)) {
+        Some(g) => Ok(g),
+        _ => Err(OperationCode::RetrieveError {
+            code: 404,
+            message: format!("Group with ID = {} not found", group_id),
+        }),
+    }
 }
 
 pub fn get_events_collection() -> HashMap<String, Event> {

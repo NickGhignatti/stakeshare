@@ -2,15 +2,24 @@ use candid::Principal;
 
 use crate::memory::get_collections;
 
-use super::functions::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority};
+use super::{
+    functions::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
+    types::OperationCode,
+};
 
 use dotenv::dotenv;
 
-pub async fn assign_nft_to_group_member(uuid: String) -> Result<String, String> {
+pub async fn assign_nft_to_group_member(uuid: String) -> OperationCode {
     let collection = get_collections();
     let group = match collection.get(&uuid) {
         Some(group) => group,
-        _ => return Err("Cannot find group ID".to_string()),
+        // should never trigger this match arm cause the insertion has been done some lines before
+        _ => {
+            return OperationCode::RetrieveError {
+                code: 404,
+                message: format!("Not found group with id = {}", uuid),
+            }
+        }
     };
     dotenv().ok();
     let factory_canister_id =
@@ -34,15 +43,20 @@ pub async fn assign_nft_to_group_member(uuid: String) -> Result<String, String> 
         )
         .await;
         match mint_icrc7_for_user(member.internet_identity.clone(), icrc7_canister_id).await {
-            Ok(_value) => {}
-            Err(err) => {
-                return Err(format!(
-                    "Error minting NFT for user {} : {:?}",
-                    member.name.clone(),
-                    err
-                ))
+            Err(_) => {
+                return OperationCode::MintingError {
+                    code: 499,
+                    message: format!(
+                        "Minting error for the user = {}",
+                        member.internet_identity.clone()
+                    ),
+                }
             }
+            _ => {}
         };
     }
-    Ok(String::from("Done"))
+    OperationCode::MintOk {
+        code: 200,
+        message: format!("Minting done for the group {}", group.group_name.clone()),
+    }
 }
