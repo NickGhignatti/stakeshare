@@ -69,11 +69,15 @@ function App() {
 
   async function printGroups() {
     await agent.fetchRootKey();
-    backend_webapp.print_groups().then(groups => console.log(groups)).catch(e => console.log(e));
+    backend_webapp
+      .print_groups()
+      .then((groups) => console.log(groups))
+      .catch((e) => console.log(e));
   }
 
   async function removeGroup() {
-    const groupId = (document.getElementById("groupName") as HTMLInputElement).value;
+    const groupId = (document.getElementById("groupName") as HTMLInputElement)
+      .value;
     console.log(groupId);
     await agent.fetchRootKey();
     backend_webapp.remove_group(groupId).then(() => console.log("DONE"));
@@ -81,28 +85,21 @@ function App() {
 
   async function handleSubmit() {
     await agent.fetchRootKey();
-    authClient.isAuthenticated().then((isAuth) => {
+    authClient.isAuthenticated().then(async (isAuth) => {
       if (isAuth) {
-        // webapp
-        //   .mint_collection_canister({
-        //     icrc7_supply_cap: [],
-        //     icrc7_description: ["ProvaF"],
-        //     tx_window: [],
-        //     icrc7_max_query_batch_size: [],
-        //     permitted_drift: [],
-        //     icrc7_max_take_value: [],
-        //     icrc7_max_memo_size: [],
-        //     icrc7_symbol: "MySymbol",
-        //     icrc7_max_update_batch_size: [],
-        //     icrc7_atomic_batch_transfers: [],
-        //     icrc7_default_take_value: [],
-        //     icrc7_logo: [],
-        //     icrc7_name: "ProvaF",
-        //   })
-        //   .then((s) => console.log(s))
-        //   .catch((e) => console.log(e));
+        await agent.fetchRootKey();
+        backend_webapp
+          .create_event(
+            "Evento di prova",
+            "Evento creato a solo scopo illustrativo"
+          )
+          .then(() => console.log("Finished"));
       }
     });
+  }
+
+  function showEvents() {
+    backend_webapp.show_events().then(events => console.log(events));
   }
 
   async function callWhoAmI() {
@@ -111,6 +108,15 @@ function App() {
     backend_webapp
       .call_canister_whoami(canisterId[0][0])
       .then((s) => console.log(s));
+  }
+
+  async function assignEvent() {
+    const groupId = (document.getElementById("groupId") as HTMLInputElement)
+      .value;
+    const eventId = (document.getElementById("eventId") as HTMLInputElement)
+      .value;
+    await agent.fetchRootKey();
+    backend_webapp.assign_event_to_group(eventId, groupId).then(s => console.log(s));
   }
 
   return (
@@ -126,6 +132,13 @@ function App() {
       <form action="#" onSubmit={createGroup}>
         <label htmlFor="groupName">Enter your name: &nbsp;</label>
         <input id="groupName" alt="Name" type="text" />
+        <button type="submit">Click Me!</button>
+      </form>
+      <form action="#" onSubmit={assignEvent}>
+        <label htmlFor="eventId">Enter event_id: &nbsp;</label>
+        <input id="eventId" alt="Name" type="text" />
+        <label htmlFor="groupId">Enter group_id: &nbsp;</label>
+        <input id="groupId" alt="Name" type="text" />
         <button type="submit">Click Me!</button>
       </form>
       <section>
@@ -146,6 +159,11 @@ function App() {
       <section>
         <button id="showGroups" onClick={removeGroup}>
           R groups
+        </button>
+      </section>
+      <section>
+        <button id="showGroups" onClick={showEvents}>
+          E groups
         </button>
       </section>
       <section id="greeting">{greeting}</section>

@@ -3,7 +3,7 @@ use ic_cdk::call;
 
 use crate::memory::{get_current_token_id, increase_token_id};
 
-use super::types::{Account, Arg, MintArg, MintResult};
+use super::types::{Account, Arg, MintArg, MintResult, TransferArg, TransferResult};
 
 pub async fn update_minting_authority(
     factory_id: Principal,
@@ -85,4 +85,9 @@ pub async fn mint_icrc7_for_user(owner: Principal, icrc7_canister_id: Principal)
     result
 }
 
-// pub async fn transfer
+pub async fn transfer(collection_id: Principal, args: Vec<TransferArg>, caller: Principal) {
+    let (result,): (Vec<Option<TransferResult>>,) =
+        call(collection_id, "icrc7_transfer", (args, caller))
+            .await
+            .unwrap();
+}

@@ -15,18 +15,25 @@ export const idlFactory = ({ IDL }) => {
     'icrc7_logo' : IDL.Opt(IDL.Text),
     'icrc7_name' : IDL.Text,
   });
+  const Account = IDL.Record({
+    'owner' : IDL.Principal,
+    'subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+  });
   const Result = IDL.Variant({ 'Ok' : IDL.Principal, 'Err' : IDL.Text });
   return IDL.Service({
-    'call_whoami' : IDL.Func([], [IDL.Vec(IDL.Text)], []),
-    'mint_collection_canister' : IDL.Func([Arg], [Result], []),
+    'mint_collection_canister' : IDL.Func([Arg, Account], [Result], []),
     'show_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
         ['query'],
       ),
+    'update_minting_aythority' : IDL.Func(
+        [IDL.Principal, IDL.Principal],
+        [IDL.Bool],
+        [],
+      ),
     'whoami' : IDL.Func([IDL.Principal], [IDL.Text], ['query']),
   });
 };
-  // @ts-ignore
-  export const init = ({ IDL }) => { return []; };
-  
+// @ts-ignore
+export const init = ({ IDL }) => { return []; };

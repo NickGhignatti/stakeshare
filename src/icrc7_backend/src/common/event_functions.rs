@@ -6,7 +6,7 @@ use super::functions::{create_icrc7_collection, mint_icrc7_for_user, update_mint
 
 use dotenv::dotenv;
 
-async fn assign_nft_for_event(event_id: String, group_id: String) -> Result<String, String> {
+pub async fn assign_nft_for_event(event_id: String, group_id: String) -> Result<String, String> {
     let event_collection = get_events_collection();
     let event = match event_collection.get(&event_id) {
         Some(e) => e.clone(),

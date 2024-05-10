@@ -1,12 +1,8 @@
 use candid::Principal;
-use ic_cdk::call;
 
-use crate::memory::{get_collections, get_current_token_id, increase_token_id};
+use crate::memory::get_collections;
 
-use super::{
-    functions::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
-    types::{MintArg, MintResult},
-};
+use super::functions::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority};
 
 use dotenv::dotenv;
 

@@ -42,11 +42,11 @@ pub fn get_events_collection() -> HashMap<String, Event> {
     EVENT_COLLECTIONS.with(|collection| collection.borrow().iter().collect())
 }
 
-pub fn insert_event(event: Event) {
+pub fn insert_event_in_collection(event: Event) {
     EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().insert(event.id.clone(), event));
 }
 
-pub fn remove_event(event_id: String) {
+pub fn remove_event_from_collection(event_id: String) {
     EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().remove(&event_id));
 }
 
@@ -55,5 +55,6 @@ pub fn get_current_token_id() -> u128 {
 }
 
 pub fn increase_token_id() {
-    TOKEN_COUNTER.with(|token| token.borrow_mut().set(get_current_token_id() + 1));
+    let old_token_id = get_current_token_id();
+    TOKEN_COUNTER.with(|token| token.borrow_mut().set(old_token_id + 1));
 }

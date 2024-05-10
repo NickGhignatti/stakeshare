@@ -105,6 +105,28 @@ pub struct Arg {
     pub permitted_drift: Option<u64>,
 }
 
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct TransferArg {
+    pub from_subaccount: Option<Subaccount>,
+    pub to: Account,
+    pub token_id: u128,
+    pub memo: Option<Vec<u8>>,
+    pub created_at_time: Option<u64>,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub enum TransferError {
+    NonExistingTokenId,
+    InvalidRecipient,
+    Unauthorized,
+    TooOld,
+    CreatedInFuture { ledger_time: u64 },
+    Duplicate { duplicate_of: u128 },
+    GenericError { error_code: u128, message: String },
+    GenericBatchError { error_code: u128, message: String },
+}
+
+pub type TransferResult = Result<u128, TransferError>;
 pub type MintResult = Result<u128, MintError>;
 
 #[derive(CandidType, Clone, Deserialize, Debug)]
@@ -115,4 +137,10 @@ pub enum MintError {
     TokenIdMinimumLimit,
     GenericError { error_code: u128, message: String },
     GenericBatchError { error_code: u128, message: String },
+}
+
+#[derive(CandidType, Clone, Debug)]
+pub enum OperationError {
+    RetrieveError { error_code: u16, message: String },
+    InsertError { error_code: u16, message: String },
 }
