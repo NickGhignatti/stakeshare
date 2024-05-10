@@ -1,8 +1,9 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, collections::HashMap};
 
-use candid::{CandidType, Principal};
+use candid::{CandidType, Int, Nat, Principal};
 use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
+use serde_bytes::ByteBuf;
 
 #[derive(CandidType, Deserialize, Serialize, Clone)]
 pub struct Group {
@@ -148,3 +149,14 @@ pub enum OperationCode {
     DuplicateEntry { code: u16, message: String },
     MintingError { code: u16, message: String },
 }
+
+/// Variant type for the `metadata` endpoint values.
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum MetadataValue {
+    Nat(Nat),
+    Int(Int),
+    Text(String),
+    Blob(ByteBuf),
+}
+
+pub type Icrc7TokenMetadata = HashMap<String, MetadataValue>;

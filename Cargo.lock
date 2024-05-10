@@ -381,6 +381,7 @@ dependencies = [
  "icrc-ledger-types",
  "rand",
  "serde",
+ "serde_bytes",
  "serde_json",
  "uuid",
 ]

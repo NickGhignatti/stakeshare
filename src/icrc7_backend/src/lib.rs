@@ -6,7 +6,7 @@ use common::{
     functions::group_already_present,
     group_functions::assign_nft_to_group_member,
     guards::not_anonymous_caller,
-    types::{Event, OperationCode},
+    types::{Account, Event, OperationCode},
     uuid::uuidv4,
 };
 use ic_cdk::call;
@@ -16,7 +16,7 @@ pub mod common;
 pub mod icrc7;
 pub mod memory;
 
-use common::types::{Group, Member};
+use common::types::{Group, Icrc7TokenMetadata, Member};
 use memory::{
     get_collections, get_events_collection, get_group_by_id, insert_collection,
     insert_event_in_collection, remove_entry, remove_event_from_collection,
