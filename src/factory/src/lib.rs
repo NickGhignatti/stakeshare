@@ -18,8 +18,9 @@ pub mod memory;
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 async fn mint_collection_canister(arg: Arg, minting_account: Account) -> Result<Principal, String> {
-    let caller = ic_cdk::caller();
+    // let caller = ic_cdk::caller();
     let account = minting_account;
+    ic_cdk::println!("Account = {}", account.owner.clone());
     let principal = match create_canister(
         CreateCanisterArgument {
             settings: Some(CanisterSettings {
@@ -48,7 +49,7 @@ async fn mint_collection_canister(arg: Arg, minting_account: Account) -> Result<
     .await
     {
         Ok(()) => {
-            insert_collection(caller.clone(), principal);
+            insert_collection(account.owner.clone(), principal);
             Ok(principal)
         }
         Err((code, msg)) => Err(format!("Code: {:?}, Message: {:?}", code, msg)),

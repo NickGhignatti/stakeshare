@@ -55,6 +55,7 @@ pub async fn subscribe_group(group: Group) -> OperationCode {
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
+    ic_cdk::println!("{}", caller);
     let factory_canister_id =
         Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =
@@ -62,6 +63,9 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
             Ok(map) => map,
             _ => (HashMap::new(),),
         };
+    for (k, v) in all_collections.clone() {
+        ic_cdk::println!("key = {}, value = {}", k, v);
+    }
     all_collections
         .iter()
         .filter(|(_k, v)| *v.to_string() == *caller.to_string())

@@ -70,7 +70,7 @@ function App() {
   async function printGroups() {
     await agent.fetchRootKey();
     backend_webapp
-      .print_groups()
+      .get_all_groups()
       .then((groups) => console.log(groups))
       .catch((e) => console.log(e));
   }
@@ -99,15 +99,12 @@ function App() {
   }
 
   function showEvents() {
-    backend_webapp.show_events().then(events => console.log(events));
+    backend_webapp.get_all_events().then(events => console.log(events));
   }
 
   async function callWhoAmI() {
     await agent.fetchRootKey();
     const canisterId = await webapp.show_collections();
-    backend_webapp
-      .call_canister_whoami(canisterId[0][0])
-      .then((s) => console.log(s));
   }
 
   async function assignEvent() {
@@ -117,6 +114,11 @@ function App() {
       .value;
     await agent.fetchRootKey();
     backend_webapp.assign_event_to_group(eventId, groupId).then(s => console.log(s));
+  }
+
+  async function getMyCollection() {
+    await agent.fetchRootKey();
+    backend_webapp.get_user_collections().then(collection => console.log(collection));
   }
 
   return (
@@ -164,6 +166,11 @@ function App() {
       <section>
         <button id="showGroups" onClick={showEvents}>
           E groups
+        </button>
+      </section>
+      <section>
+        <button id="showGroups" onClick={getMyCollection}>
+          C groups
         </button>
       </section>
       <section id="greeting">{greeting}</section>
