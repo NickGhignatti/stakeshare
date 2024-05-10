@@ -22,8 +22,8 @@ pub fn icrc7_mint(arg: MintArg, caller: Principal) -> MintResult {
 }
 
 #[ic_cdk::update]
-pub fn icrc7_transfer(args: Vec<TransferArg>) -> Vec<Option<TransferResult>> {
-    let caller = ic_cdk::caller();
+pub fn icrc7_transfer(args: Vec<TransferArg>, caller: Principal) -> Vec<Option<TransferResult>> {
+    // let caller = ic_cdk::caller();
     STATE.with(|s| s.borrow_mut().icrc7_transfer(&caller, args))
 }
 
