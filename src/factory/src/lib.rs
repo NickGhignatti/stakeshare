@@ -82,4 +82,17 @@ pub fn whoami(caller: Principal) -> String {
     caller.to_string()
 }
 
+#[ic_cdk::query(guard = "not_anonymous_caller")]
+pub fn check_collection_ownership(collection_id: Principal, owner: Principal) -> bool {
+    match get_collections().get(&collection_id) {
+        Some(value) => {
+            if value.to_string() == owner.to_string() {
+                return true;
+            }
+            return false;
+        }
+        _ => return false,
+    }
+}
+
 export_candid!();
