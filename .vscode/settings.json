@@ -6,6 +6,7 @@
         "structure",
         "frontend",
         "backend",
-        "memory"
+        "memory",
+        "event"
     ]
 }
