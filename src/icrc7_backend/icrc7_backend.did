@@ -1,10 +1,17 @@
+type Event = record { id : text; title : text; description : text };
 type Group = record { group_members : vec Member; group_name : text };
 type Member = record { name : text; internet_identity : principal };
 service : {
+  assign_event_to_group : (text, text) -> ();
   call_canister_whoami : (principal) -> (text);
+  create_event : (text, text) -> ();
   get_group_members : (text) -> (vec Member) query;
+  get_user_collections : () -> (vec record { principal; principal });
   print_groups : () -> (vec record { text; Group }) query;
+  remove_all_groups : () -> ();
+  remove_event : (text) -> ();
   remove_group : (text) -> ();
+  show_events : () -> (vec Event) query;
   subscribe_group : (Group) -> ();
   whoami : () -> (principal) query;
 }

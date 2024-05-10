@@ -194,7 +194,7 @@ service : (InitArg) -> {
   icrc7_tokens : (opt nat, opt nat) -> (vec nat) query;
   icrc7_tokens_of : (Account, opt nat, opt nat) -> (vec nat) query;
   icrc7_total_supply : () -> (nat) query;
-  icrc7_transfer : (vec TransferArg) -> (vec opt Result_4);
+  icrc7_transfer : (vec TransferArg, principal) -> (vec opt Result_4);
   icrc7_txn_logs : (nat32, nat32) -> (vec Transaction) query;
   metadata : (text) -> (ExtMetadataResult) query;
   mintNFT : (ExtMintArg) -> (nat32);
