@@ -13,6 +13,7 @@ use ic_cdk::call;
 use ic_cdk_macros::export_candid;
 
 pub mod common;
+pub mod icrc7;
 pub mod memory;
 
 use common::types::{Group, Member};
@@ -175,11 +176,8 @@ pub fn remove_event(event_id: String) {
 /// * `event_id` String representing the event ID
 /// * `group_id` String representing the group ID
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn assign_event_to_group(event_id: String, group_id: String) {
-    match assign_nft_for_event(event_id, group_id).await {
-        Ok(s) => ic_cdk::println!("{}", s),
-        Err(e) => ic_cdk::println!("{}", e),
-    }
+pub async fn assign_event_to_group(event_id: String, group_id: String) -> OperationCode {
+    assign_nft_for_event(event_id, group_id).await
 }
 
 #[ic_cdk::query]
