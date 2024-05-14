@@ -8,6 +8,7 @@
         "backend",
         "memory",
         "event",
-        "groups"
+        "groups",
+        "ipfs"
     ]
 }
