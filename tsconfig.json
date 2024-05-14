@@ -7,5 +7,6 @@
         "moduleResolution": "node",
         "allowJs": false,
         "outDir": "HACK_BECAUSE_OF_ALLOW_JS"
-    }
+    },
+    "exclude": ["candid/*"]
 }
