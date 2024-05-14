@@ -21,6 +21,11 @@ export const idlFactory = ({ IDL }) => {
   });
   const Result = IDL.Variant({ 'Ok' : IDL.Principal, 'Err' : IDL.Text });
   return IDL.Service({
+    'check_collection_ownership' : IDL.Func(
+        [IDL.Principal, IDL.Principal],
+        [IDL.Bool],
+        ['query'],
+      ),
     'mint_collection_canister' : IDL.Func([Arg, Account], [Result], []),
     'show_collections' : IDL.Func(
         [],

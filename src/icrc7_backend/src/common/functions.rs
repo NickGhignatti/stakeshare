@@ -1,5 +1,6 @@
 use candid::Principal;
 use ic_cdk::call;
+use icrc_ledger_types::icrc;
 
 use crate::memory::{get_collections, get_current_token_id, increase_token_id};
 
@@ -21,6 +22,8 @@ pub async fn create_icrc7_collection(
     owner: Principal,
     factory_id: Principal,
     icrc7_name: String,
+    icrc7_description: Option<String>,
+    icrc7_logo: Option<String>,
 ) -> Principal {
     let (result,): (Result<Principal, String>,) = call(
         factory_id,
@@ -29,8 +32,8 @@ pub async fn create_icrc7_collection(
             Arg {
                 icrc7_symbol: format!("ICP"),
                 icrc7_name: icrc7_name,
-                icrc7_description: None,
-                icrc7_logo: None,
+                icrc7_description: icrc7_description,
+                icrc7_logo: icrc7_logo,
                 icrc7_supply_cap: None,
                 icrc7_max_query_batch_size: None,
                 icrc7_max_update_batch_size: None,

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Principal } from "@dfinity/principal";
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor, HttpAgent, Identity } from "@dfinity/agent";
 import { _SERVICE as _FCTRY_SERVICE } from "../../declarations/factory/factory.did";
@@ -58,13 +59,13 @@ function App() {
       internet_identity: identity.getPrincipal(),
     };
     await agent.fetchRootKey();
-    backend_webapp
-      .subscribe_group({
-        group_name: "Gruppo di prova",
-        group_members: [member],
-      })
-      .then((success) => console.log(success))
-      .catch((error) => console.log(error));
+    // backend_webapp
+    //   .subscribe_group({
+    //     group_name: "Gruppo di prova",
+    //     group_members: [member],
+    //   })
+    //   .then((success) => console.log(success))
+    //   .catch((error) => console.log(error));
   }
 
   async function printGroups() {
@@ -84,16 +85,13 @@ function App() {
   }
 
   async function handleSubmit() {
-    await agent.fetchRootKey();
     authClient.isAuthenticated().then(async (isAuth) => {
       if (isAuth) {
         await agent.fetchRootKey();
-        backend_webapp
-          .create_event(
-            "Evento di prova",
-            "Evento creato a solo scopo illustrativo"
-          )
-          .then(() => console.log("Finished"));
+        const groupName = (document.getElementById("name") as HTMLInputElement).value;
+        const memberName = (document.getElementById("nameMem") as HTMLInputElement).value;
+        const memberId = (document.getElementById("idMem") as HTMLInputElement).value;
+        backend_webapp.subscribe_group([{ 'name' : memberName, 'internet_identity' : memberId}], groupName)
       }
     });
   }
@@ -128,8 +126,11 @@ function App() {
       <br />
       <form action="#" onSubmit={handleSubmit}>
         <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
+        <input id="name" alt="Name" type="text" placeholder="Enter your name" />
+        <input id="nameMem" alt="NameMem" type="text" placeholder="Name of a member"/>
+        <input id="idMem" alt="IdMem" type="text" placeholder="Internet Identity of a member"/>
+        <input id="groupName" alt="GroupName" type="text" placeholder="Group name"/>
+        <button type="submit">Subscribe Group!</button>
       </form>
       <form action="#" onSubmit={createGroup}>
         <label htmlFor="groupName">Enter your name: &nbsp;</label>

@@ -9,7 +9,7 @@ use common::{
     types::{Account, Event, OperationCode},
     uuid::uuidv4,
 };
-use ic_cdk::call;
+use ic_cdk::{call, caller};
 use ic_cdk_macros::export_candid;
 
 pub mod common;
@@ -36,15 +36,32 @@ use memory::{
 /// * `499` if there has been a minting error for a certain member
 /// * `200` if everything is ok
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn subscribe_group(group: Group) -> OperationCode {
-    if group_already_present(group.group_name.clone()) {
+pub async fn subscribe_group(
+    mut members: Vec<Member>,
+    chef_name: String,
+    group_name: String,
+) -> OperationCode {
+    if group_already_present(group_name.clone()) {
         return OperationCode::DuplicateEntry {
             code: 400,
-            message: format!("Duplicate entry for {}", group.group_name),
+            message: format!("Duplicate entry for {}", group_name),
         };
     }
     let group_id = uuidv4();
-    insert_collection(group_id.clone(), group);
+    members.insert(
+        members.len(),
+        Member {
+            name: chef_name,
+            internet_identity: caller().to_string(),
+        },
+    );
+    insert_collection(
+        group_id.clone(),
+        Group {
+            group_name: group_name,
+            group_members: members,
+        },
+    );
     assign_nft_to_group_member(group_id).await
 }
 
@@ -53,7 +70,7 @@ pub async fn subscribe_group(group: Group) -> OperationCode {
 ///
 /// ### return
 /// * Hashmap containing Principal of the collection and Principal of the owner
-#[ic_cdk::update(guard = "not_anonymous_caller")]
+#[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
     ic_cdk::println!("{}", caller);
