@@ -193,8 +193,12 @@ pub fn remove_event(event_id: String) {
 /// * `event_id` String representing the event ID
 /// * `group_id` String representing the group ID
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn assign_event_to_group(event_id: String, group_id: String) -> OperationCode {
-    assign_nft_for_event(event_id, group_id).await
+pub async fn assign_event_to_group(
+    event_id: String,
+    group_id: String,
+    metadata: Vec<u8>,
+) -> OperationCode {
+    assign_nft_for_event(event_id, group_id, metadata).await
 }
 
 #[ic_cdk::query]

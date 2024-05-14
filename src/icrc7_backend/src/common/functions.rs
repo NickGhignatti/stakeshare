@@ -1,5 +1,8 @@
+use std::io::Cursor;
+
 use candid::Principal;
 use ic_cdk::call;
+use ipfs_api_backend_hyper::{IpfsApi, IpfsClient};
 
 use crate::memory::{get_collections, get_current_token_id, increase_token_id};
 
@@ -93,4 +96,14 @@ pub fn group_already_present(name: String) -> bool {
         .filter(|(_k, v)| v.group_name.clone() == name)
         .count()
         > 0
+}
+
+pub async fn insert_metadata_ipfs(metadata: Vec<u8>) {
+    let client = IpfsClient::default();
+    let data = Cursor::new(metadata);
+
+    match client.add(data).await {
+        Ok(res) => ic_cdk::println!("{}", res.hash),
+        Err(e) => ic_cdk::println!("Error reading file: {}", e),
+    }
 }
