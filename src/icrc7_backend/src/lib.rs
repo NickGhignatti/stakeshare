@@ -6,7 +6,7 @@ use common::{
     functions::group_already_present,
     group_functions::assign_nft_to_group_member,
     guards::not_anonymous_caller,
-    types::{Account, Event, OperationCode},
+    types::{Account, Event, OperationCode, TransferArg, TransferResult},
     uuid::uuidv4,
 };
 use ic_cdk::{call, caller};
