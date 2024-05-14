@@ -24,25 +24,22 @@ pub async fn assign_nft_to_group_member(uuid: String) -> OperationCode {
     dotenv().ok();
     let factory_canister_id =
         Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
+    let app_id = Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai".to_string()).unwrap();
     for member in group.group_members.clone() {
         let icrc7_name = format!(
             "Commemorative NFT for {} to join {} group!",
             member.name, group.group_name
         );
-        let icrc7_canister_id = create_icrc7_collection(
-            member.internet_identity.clone(),
-            factory_canister_id,
-            icrc7_name,
-        )
-        .await;
+        let icrc7_canister_id =
+            create_icrc7_collection(app_id, factory_canister_id, icrc7_name, None, None).await;
         // updating minting authority, default is on the factory canister
-        update_minting_authority(
-            factory_canister_id,
-            member.internet_identity.clone(),
+        update_minting_authority(factory_canister_id, app_id, icrc7_canister_id).await;
+        match mint_icrc7_for_user(
+            Principal::from_text(member.internet_identity.clone()).unwrap(),
             icrc7_canister_id,
         )
-        .await;
-        match mint_icrc7_for_user(member.internet_identity.clone(), icrc7_canister_id).await {
+        .await
+        {
             Err(_) => {
                 return OperationCode::MintingError {
                     code: 499,

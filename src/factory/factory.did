@@ -16,6 +16,7 @@ type Arg = record {
 };
 type Result = variant { Ok : principal; Err : text };
 service : {
+  check_collection_ownership : (principal, principal) -> (bool) query;
   mint_collection_canister : (Arg, Account) -> (Result);
   show_collections : () -> (vec record { principal; principal }) query;
   update_minting_aythority : (principal, principal) -> (bool);

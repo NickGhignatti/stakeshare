@@ -36,7 +36,7 @@ impl Storable for Group {
 #[derive(CandidType, Clone, Deserialize, Serialize)]
 pub struct Member {
     pub name: String,
-    pub internet_identity: Principal,
+    pub internet_identity: String,
 }
 
 pub type Subaccount = [u8; 32];

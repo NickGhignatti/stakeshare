@@ -1,6 +1,8 @@
+type Account = record { owner : principal; subaccount : opt blob };
 type Event = record { id : text; title : text; description : text };
 type Group = record { group_members : vec Member; group_name : text };
-type Member = record { name : text; internet_identity : principal };
+type Member = record { name : text; internet_identity : text };
+type MetadataValue = variant { Int : int; Nat : nat; Blob : blob; Text : text };
 type OperationCode = variant {
   DuplicateEntry : record { code : nat16; message : text };
   MintingError : record { code : nat16; message : text };
@@ -10,15 +12,35 @@ type OperationCode = variant {
   RetrieveError : record { code : nat16; message : text };
 };
 service : {
-  assign_event_to_group : (text, text) -> ();
+  assign_event_to_group : (text, text) -> (OperationCode);
   create_event : (text, text) -> ();
   get_all_events : () -> (vec Event) query;
   get_all_groups : () -> (vec record { text; Group }) query;
   get_group_members : (text) -> (vec Member) query;
+  get_icrc7_description : (principal) -> (opt text) composite_query;
+  get_icrc7_logo : (principal) -> (opt text) composite_query;
+  get_icrc7_max_memo_size : (principal) -> (opt nat) composite_query;
+  get_icrc7_max_query_batch_size : (principal) -> (opt nat) composite_query;
+  get_icrc7_max_take_value : (principal) -> (opt nat) composite_query;
+  get_icrc7_max_update_batch_size : (principal) -> (opt nat) composite_query;
+  get_icrc7_name : (principal) -> (text) composite_query;
+  get_icrc7_supply_cap : (principal) -> (opt nat) composite_query;
+  get_icrc7_symbol : (principal) -> (text) composite_query;
+  get_icrc7_token_metadata : (vec nat, principal) -> (
+      vec opt vec record { text; MetadataValue },
+    ) composite_query;
+  get_icrc7_total_supply : (principal) -> (nat) composite_query;
   get_user_collections : () -> (vec record { principal; principal });
+  icrc7_atomic_batch_transfers : (principal) -> (opt bool) composite_query;
+  icrc7_balance_of : (vec Account, principal) -> (vec nat) composite_query;
+  icrc7_owner_of : (vec nat, principal) -> (vec opt Account) composite_query;
+  icrc7_tokens : (opt nat, opt nat, principal) -> (vec nat) composite_query;
+  icrc7_tokens_of : (Account, opt nat, opt nat, principal) -> (
+      vec nat,
+    ) composite_query;
   remove_all_groups : () -> ();
   remove_event : (text) -> ();
   remove_group : (text) -> (OperationCode);
-  subscribe_group : (Group) -> (OperationCode);
+  subscribe_group : (vec Member, text) -> (OperationCode);
   whoami : () -> (principal) query;
 }

@@ -38,20 +38,13 @@ pub async fn assign_nft_for_event(event_id: String, group_id: String) -> Operati
             "Commemorative NFT for {} to partecipate at the event {}!",
             member.name, event.title
         );
-        let icrc7_canister_id = create_icrc7_collection(
-            member.internet_identity.clone(),
-            factory_canister_id,
-            icrc7_name,
-        )
-        .await;
+        let owner = Principal::from_text(member.internet_identity.clone()).unwrap();
+        let icrc7_canister_id =
+            create_icrc7_collection(owner.clone(), factory_canister_id, icrc7_name, None, None)
+                .await;
         // updating minting authority, default is on the factory canister
-        update_minting_authority(
-            factory_canister_id,
-            member.internet_identity.clone(),
-            icrc7_canister_id,
-        )
-        .await;
-        match mint_icrc7_for_user(member.internet_identity.clone(), icrc7_canister_id).await {
+        update_minting_authority(factory_canister_id, owner.clone(), icrc7_canister_id).await;
+        match mint_icrc7_for_user(owner.clone(), icrc7_canister_id).await {
             Ok(_value) => {}
             Err(err) => {
                 return OperationCode::MintingError {
