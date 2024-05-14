@@ -3,10 +3,7 @@ use candid::Principal;
 use crate::memory::{get_collections, get_events_collection};
 
 use super::{
-    functions::{
-        create_icrc7_collection, insert_metadata_ipfs, mint_icrc7_for_user,
-        update_minting_authority,
-    },
+    functions::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
     types::OperationCode,
 };
 
@@ -15,6 +12,7 @@ use dotenv::dotenv;
 pub async fn assign_nft_for_event(
     event_id: String,
     group_id: String,
+    icrc7_description: Option<String>,
     metadata: Vec<u8>,
 ) -> OperationCode {
     let event_collection = get_events_collection();
@@ -28,9 +26,9 @@ pub async fn assign_nft_for_event(
         }
     };
 
-    if metadata.len() > 0 {
-        insert_metadata_ipfs(metadata).await;
-    }
+    // if metadata.len() > 0 {
+    //     insert_metadata_ipfs(metadata).await;
+    // }
 
     let group_collection = get_collections();
     let group = match group_collection.get(&group_id) {
@@ -51,9 +49,14 @@ pub async fn assign_nft_for_event(
             member.name, event.title
         );
         let owner = Principal::from_text(member.internet_identity.clone()).unwrap();
-        let icrc7_canister_id =
-            create_icrc7_collection(owner.clone(), factory_canister_id, icrc7_name, None, None)
-                .await;
+        let icrc7_canister_id = create_icrc7_collection(
+            owner.clone(),
+            factory_canister_id,
+            icrc7_name,
+            icrc7_description.clone(),
+            Some(String::from_utf8(metadata.clone()).unwrap_or(String::new())),
+        )
+        .await;
         // updating minting authority, default is on the factory canister
         update_minting_authority(factory_canister_id, owner.clone(), icrc7_canister_id).await;
         match mint_icrc7_for_user(owner.clone(), icrc7_canister_id).await {

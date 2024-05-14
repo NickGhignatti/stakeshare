@@ -11,11 +11,30 @@ type OperationCode = variant {
   InsertError : record { code : nat16; message : text };
   RetrieveError : record { code : nat16; message : text };
 };
+type Result = variant { Ok : nat; Err : TransferError };
+type TransferArg = record {
+  to : Account;
+  token_id : nat;
+  memo : opt blob;
+  from_subaccount : opt blob;
+  created_at_time : opt nat64;
+};
+type TransferError = variant {
+  GenericError : record { message : text; error_code : nat };
+  Duplicate : record { duplicate_of : nat };
+  NonExistingTokenId;
+  Unauthorized;
+  CreatedInFuture : record { ledger_time : nat64 };
+  InvalidRecipient;
+  GenericBatchError : record { message : text; error_code : nat };
+  TooOld;
+};
 service : {
-  assign_event_to_group : (text, text) -> (OperationCode);
+  assign_event_to_group : (text, text, blob) -> (OperationCode);
   create_event : (text, text) -> ();
   get_all_events : () -> (vec Event) query;
   get_all_groups : () -> (vec record { text; Group }) query;
+  get_all_nft_collections : () -> (vec record { principal; principal });
   get_group_members : (text) -> (vec Member) query;
   get_icrc7_description : (principal) -> (opt text) composite_query;
   get_icrc7_logo : (principal) -> (opt text) composite_query;
@@ -38,9 +57,10 @@ service : {
   icrc7_tokens_of : (Account, opt nat, opt nat, principal) -> (
       vec nat,
     ) composite_query;
+  icrc7_transfer : (principal, vec TransferArg, principal) -> (vec opt Result);
   remove_all_groups : () -> ();
   remove_event : (text) -> ();
   remove_group : (text) -> (OperationCode);
-  subscribe_group : (vec Member, text) -> (OperationCode);
+  subscribe_group : (vec Member, text, text) -> (OperationCode);
   whoami : () -> (principal) query;
 }

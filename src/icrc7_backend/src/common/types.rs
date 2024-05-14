@@ -5,7 +5,7 @@ use ic_stable_structures::{storable::Bound, Storable};
 use serde::{Deserialize, Serialize};
 use serde_bytes::ByteBuf;
 
-#[derive(CandidType, Deserialize, Serialize, Clone)]
+#[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
 pub struct Group {
     pub group_name: String,
     pub group_members: Vec<Member>,
@@ -33,7 +33,7 @@ impl Storable for Group {
     const BOUND: Bound = Bound::Unbounded;
 }
 
-#[derive(CandidType, Clone, Deserialize, Serialize)]
+#[derive(CandidType, Clone, Deserialize, Serialize, Debug)]
 pub struct Member {
     pub name: String,
     pub internet_identity: String,

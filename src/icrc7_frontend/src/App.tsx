@@ -54,18 +54,25 @@ function App() {
   }
 
   async function createGroup() {
-    const member = {
-      name: "Nicolò",
-      internet_identity: identity.getPrincipal(),
-    };
-    await agent.fetchRootKey();
-    // backend_webapp
-    //   .subscribe_group({
-    //     group_name: "Gruppo di prova",
-    //     group_members: [member],
-    //   })
-    //   .then((success) => console.log(success))
-    //   .catch((error) => console.log(error));
+    authClient.isAuthenticated().then(async (isAuth) => {
+      await agent.fetchRootKey();
+      if (isAuth) {
+        const groupId = (document.getElementById("groupId") as HTMLInputElement)
+          .value;
+        const eventId = (document.getElementById("eventId") as HTMLInputElement)
+          .value;
+        // @ts-ignore
+        const image = (document.getElementById("imageN") as HTMLInputElement)
+          .files[0];
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          backend_webapp.assign_event_to_group(eventId, groupId, new Uint8Array(arrayBuffer));
+        }
+        reader.readAsArrayBuffer(image);
+      }
+    });
   }
 
   async function printGroups() {
@@ -88,16 +95,31 @@ function App() {
     authClient.isAuthenticated().then(async (isAuth) => {
       if (isAuth) {
         await agent.fetchRootKey();
-        const groupName = (document.getElementById("name") as HTMLInputElement).value;
-        const memberName = (document.getElementById("nameMem") as HTMLInputElement).value;
-        const memberId = (document.getElementById("idMem") as HTMLInputElement).value;
-        backend_webapp.subscribe_group([{ 'name' : memberName, 'internet_identity' : memberId}], groupName)
+        const myName = (document.getElementById("name") as HTMLInputElement)
+          .value;
+        const groupName = (document.getElementById("groupName") as HTMLInputElement)
+          .value;
+        const memberName = (
+          document.getElementById("nameMem") as HTMLInputElement
+        ).value;
+        const memberId = (document.getElementById("idMem") as HTMLInputElement)
+          .value;
+        backend_webapp.subscribe_group(
+          [],
+          myName,
+          groupName
+        );
       }
     });
   }
 
+  async function createEvent() {
+    await agent.fetchRootKey();
+    await backend_webapp.create_event("Standard event", "Trial event");
+  }
+
   function showEvents() {
-    backend_webapp.get_all_events().then(events => console.log(events));
+    backend_webapp.get_all_events().then((events) => console.log(events));
   }
 
   async function callWhoAmI() {
@@ -111,12 +133,31 @@ function App() {
     const eventId = (document.getElementById("eventId") as HTMLInputElement)
       .value;
     await agent.fetchRootKey();
-    backend_webapp.assign_event_to_group(eventId, groupId).then(s => console.log(s));
+    backend_webapp
+      .assign_event_to_group(eventId, groupId, [])
+      .then((s) => console.log(s));
   }
 
   async function getMyCollection() {
+    console.log("Hello!");
     await agent.fetchRootKey();
-    backend_webapp.get_user_collections().then(collection => console.log(collection));
+    await backend_webapp.get_user_collections().then(r => {
+      console.log("mine");
+      r.forEach(item => {
+        console.log(item[0].toString() + " -> " + item[1].toString());
+      })
+    });
+    await backend_webapp.get_all_nft_collections().then(r => {
+      console.log("all");
+      r.forEach(item => {
+        console.log(item[0].toString() + " -> " + item[1].toString());
+      })
+    });
+  }
+
+  async function whoAmI() {
+    await agent.fetchRootKey();
+    backend_webapp.whoami().then(s => console.log(s.toString()));
   }
 
   return (
@@ -127,23 +168,39 @@ function App() {
       <form action="#" onSubmit={handleSubmit}>
         <label htmlFor="name">Enter your name: &nbsp;</label>
         <input id="name" alt="Name" type="text" placeholder="Enter your name" />
-        <input id="nameMem" alt="NameMem" type="text" placeholder="Name of a member"/>
-        <input id="idMem" alt="IdMem" type="text" placeholder="Internet Identity of a member"/>
-        <input id="groupName" alt="GroupName" type="text" placeholder="Group name"/>
+        <input
+          id="nameMem"
+          alt="NameMem"
+          type="text"
+          placeholder="Name of a member"
+        />
+        <input
+          id="idMem"
+          alt="IdMem"
+          type="text"
+          placeholder="Internet Identity of a member"
+        />
+        <input
+          id="groupName"
+          alt="GroupName"
+          type="text"
+          placeholder="Group name"
+        />
         <button type="submit">Subscribe Group!</button>
       </form>
       <form action="#" onSubmit={createGroup}>
-        <label htmlFor="groupName">Enter your name: &nbsp;</label>
-        <input id="groupName" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <form action="#" onSubmit={assignEvent}>
         <label htmlFor="eventId">Enter event_id: &nbsp;</label>
         <input id="eventId" alt="Name" type="text" />
         <label htmlFor="groupId">Enter group_id: &nbsp;</label>
         <input id="groupId" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
+        <input type="file" id="imageN" />
+        <button type="submit">Assign event</button>
       </form>
+      <section>
+        <button id="evBtn" onClick={createEvent}>
+          Create a test event
+        </button>
+      </section>
       <section>
         <button id="loginBtn" onClick={login}>
           Login with Internet Identity
@@ -172,6 +229,11 @@ function App() {
       <section>
         <button id="showGroups" onClick={getMyCollection}>
           C groups
+        </button>
+      </section>
+      <section>
+        <button id="whoAmI" onClick={whoAmI}>
+          WHO AM I
         </button>
       </section>
       <section id="greeting">{greeting}</section>

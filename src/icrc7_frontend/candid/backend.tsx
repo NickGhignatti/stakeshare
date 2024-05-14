@@ -31,9 +31,33 @@ export const idlFactory = ({ IDL }) => {
     'owner' : IDL.Principal,
     'subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
+  const TransferArg = IDL.Record({
+    'to' : Account,
+    'token_id' : IDL.Nat,
+    'memo' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'from_subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'created_at_time' : IDL.Opt(IDL.Nat64),
+  });
+  const TransferError = IDL.Variant({
+    'GenericError' : IDL.Record({
+      'message' : IDL.Text,
+      'error_code' : IDL.Nat,
+    }),
+    'Duplicate' : IDL.Record({ 'duplicate_of' : IDL.Nat }),
+    'NonExistingTokenId' : IDL.Null,
+    'Unauthorized' : IDL.Null,
+    'CreatedInFuture' : IDL.Record({ 'ledger_time' : IDL.Nat64 }),
+    'InvalidRecipient' : IDL.Null,
+    'GenericBatchError' : IDL.Record({
+      'message' : IDL.Text,
+      'error_code' : IDL.Nat,
+    }),
+    'TooOld' : IDL.Null,
+  });
+  const Result = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : TransferError });
   return IDL.Service({
     'assign_event_to_group' : IDL.Func(
-        [IDL.Text, IDL.Text],
+        [IDL.Text, IDL.Text, IDL.Vec(IDL.Nat8)],
         [OperationCode],
         [],
       ),
@@ -43,6 +67,11 @@ export const idlFactory = ({ IDL }) => {
         [],
         [IDL.Vec(IDL.Tuple(IDL.Text, Group))],
         ['query'],
+      ),
+    'get_all_nft_collections' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
+        [],
       ),
     'get_group_members' : IDL.Func([IDL.Text], [IDL.Vec(Member)], ['query']),
     'get_icrc7_description' : IDL.Func(
@@ -130,11 +159,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Nat)],
         ['composite_query'],
       ),
+    'icrc7_transfer' : IDL.Func(
+        [IDL.Principal, IDL.Vec(TransferArg), IDL.Principal],
+        [IDL.Vec(IDL.Opt(Result))],
+        [],
+      ),
     'remove_all_groups' : IDL.Func([], [], []),
     'remove_event' : IDL.Func([IDL.Text], [], []),
     'remove_group' : IDL.Func([IDL.Text], [OperationCode], []),
     'subscribe_group' : IDL.Func(
-        [IDL.Vec(Member), IDL.Text],
+        [IDL.Vec(Member), IDL.Text, IDL.Text],
         [OperationCode],
         [],
       ),

@@ -70,10 +70,10 @@ pub async fn subscribe_group(
 ///
 /// ### return
 /// * Hashmap containing Principal of the collection and Principal of the owner
-#[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
+#[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
-    ic_cdk::println!("{}", caller);
+    ic_cdk::println!("Get user collection caller = {}", caller);
     let factory_canister_id =
         Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =
@@ -87,6 +87,24 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     all_collections
         .iter()
         .filter(|(_k, v)| *v.to_string() == *caller.to_string())
+        .map(|(k, v)| (k.clone(), v.clone()))
+        .collect::<HashMap<Principal, Principal>>()
+}
+
+#[ic_cdk::update(guard = "not_anonymous_caller")]
+pub async fn get_all_nft_collections() -> HashMap<Principal, Principal> {
+    let factory_canister_id =
+        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
+    let (all_collections,): (HashMap<Principal, Principal>,) =
+        match call(factory_canister_id, "show_collections", ()).await {
+            Ok(map) => map,
+            _ => (HashMap::new(),),
+        };
+    for (k, v) in all_collections.clone() {
+        ic_cdk::println!("key = {}, value = {}", k, v);
+    }
+    all_collections
+        .iter()
         .map(|(k, v)| (k.clone(), v.clone()))
         .collect::<HashMap<Principal, Principal>>()
 }
@@ -198,7 +216,13 @@ pub async fn assign_event_to_group(
     group_id: String,
     metadata: Vec<u8>,
 ) -> OperationCode {
-    assign_nft_for_event(event_id, group_id, metadata).await
+    assign_nft_for_event(
+        event_id,
+        group_id,
+        Some("Basic description".to_string()),
+        metadata,
+    )
+    .await
 }
 
 #[ic_cdk::query]
