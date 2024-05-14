@@ -66,5 +66,5 @@ pub fn get_current_token_id() -> u128 {
 
 pub fn increase_token_id() {
     let old_token_id = get_current_token_id();
-    TOKEN_COUNTER.with(|token| token.borrow_mut().set(old_token_id + 1));
+    let _ = TOKEN_COUNTER.with(|token| token.borrow_mut().set(old_token_id + 1));
 }

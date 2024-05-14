@@ -1,10 +1,9 @@
 use candid::Principal;
 use ic_cdk::call;
-use icrc_ledger_types::icrc;
 
 use crate::memory::{get_collections, get_current_token_id, increase_token_id};
 
-use super::types::{Account, Arg, MintArg, MintResult, TransferArg, TransferResult};
+use super::types::{Account, Arg, MintArg, MintResult};
 
 pub async fn update_minting_authority(
     factory_id: Principal,
@@ -86,13 +85,6 @@ pub async fn mint_icrc7_for_user(owner: Principal, icrc7_canister_id: Principal)
     increase_token_id();
 
     result
-}
-
-pub async fn transfer(collection_id: Principal, args: Vec<TransferArg>, caller: Principal) {
-    let (result,): (Vec<Option<TransferResult>>,) =
-        call(collection_id, "icrc7_transfer", (args, caller))
-            .await
-            .unwrap();
 }
 
 pub fn group_already_present(name: String) -> bool {
