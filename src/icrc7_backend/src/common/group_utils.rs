@@ -3,8 +3,8 @@ use candid::Principal;
 use crate::memory::get_collections;
 
 use super::{
-    functions::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
     types::OperationCode,
+    utils::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
 };
 
 use dotenv::dotenv;

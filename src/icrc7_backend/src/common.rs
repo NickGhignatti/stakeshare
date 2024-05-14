@@ -1,6 +1,6 @@
-pub mod event_functions;
-pub mod functions;
-pub mod group_functions;
+pub mod event_utils;
+pub mod group_utils;
 pub mod guards;
 pub mod types;
+pub mod utils;
 pub mod uuid;
