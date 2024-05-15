@@ -147,18 +147,6 @@ function App() {
 
   async function getMyCollection() {
     await agent.fetchRootKey();
-    await backend_webapp.get_user_collections().then(r => {
-      console.log("Arr = " + r);
-      r.forEach(item => {
-        console.log(item[0].toString() + " -> " + item[1].toString());
-      })
-    });
-    await backend_webapp.get_all_nft_collections().then(r => {
-      console.log("All items");
-      r.forEach(item => {
-        console.log(item[0].toString() + " -> " + item[1].toString());
-      })
-    });
     backend_webapp.get_user_collection().then(coll => console.log(coll));
   }
 

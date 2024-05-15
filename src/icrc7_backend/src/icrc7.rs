@@ -16,13 +16,12 @@ pub async fn get_user_collection() -> Vec<u128> {
     let factory_canister_id = Principal::from_str(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     )
-    .unwrap();
+    .unwrap_or(Principal::anonymous());
     let (icrc7_collections,): (Vec<Principal>,) =
         match call(factory_canister_id, "get_user_collections", (caller,)).await {
             Ok(r) => r,
             _ => (vec![],),
         };
-    ic_cdk::println!("My collection = {:?}", icrc7_collections);
     let mut tokens: Vec<u128> = vec![];
     for collection in icrc7_collections.clone() {
         let (mut partial_tokens,): (Vec<u128>,) = match call(

@@ -775,7 +775,6 @@ impl State {
         if take > State::DEFAULT_MAX_TAKE_VALUE {
             ic_cdk::trap("Exceeds Max Take Value")
         }
-        ic_cdk::println!("Take value : {:?}", owned_tokens);
         owned_tokens.sort();
         match prev {
             None => owned_tokens[0..take as usize].to_vec(),
