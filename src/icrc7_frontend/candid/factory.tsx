@@ -26,6 +26,11 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Bool],
         ['query'],
       ),
+    'get_user_collections' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(IDL.Principal)],
+        ['query'],
+      ),
     'mint_collection_canister' : IDL.Func([Arg, Account], [Result], []),
     'show_collections' : IDL.Func(
         [],

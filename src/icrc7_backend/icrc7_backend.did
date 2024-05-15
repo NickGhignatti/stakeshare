@@ -1,5 +1,10 @@
 type Account = record { owner : principal; subaccount : opt blob };
-type Event = record { id : text; title : text; description : text };
+type Event = record {
+  id : text;
+  title : text;
+  metadata : MetadataValue;
+  description : text;
+};
 type Group = record { group_members : vec Member; group_name : text };
 type Member = record { name : text; internet_identity : text };
 type MetadataValue = variant { Int : int; Nat : nat; Blob : blob; Text : text };
@@ -31,7 +36,7 @@ type TransferError = variant {
 };
 service : {
   assign_event_to_group : (text, text, blob) -> (OperationCode);
-  create_event : (text, text) -> ();
+  create_event : (text, text, MetadataValue) -> ();
   get_all_events : () -> (vec Event) query;
   get_all_groups : () -> (vec record { text; Group }) query;
   get_all_nft_collections : () -> (vec record { principal; principal });

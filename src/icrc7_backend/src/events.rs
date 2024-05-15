@@ -2,7 +2,7 @@ use crate::{
     common::{
         event_utils::assign_nft_for_event,
         guards::not_anonymous_caller,
-        types::{Event, OperationCode},
+        types::{Event, MetadataValue, OperationCode},
         uuid::uuidv4,
     },
     memory::{get_events_collection, insert_event_in_collection, remove_event_from_collection},
@@ -15,11 +15,12 @@ use crate::{
 /// * `name` name of the event
 /// * `description` description of the event
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub fn create_event(name: String, description: String) {
+pub fn create_event(name: String, description: String, metadata: MetadataValue) {
     insert_event_in_collection(Event {
         id: uuidv4(),
         title: name,
         description: description,
+        metadata: metadata,
     });
 }
 

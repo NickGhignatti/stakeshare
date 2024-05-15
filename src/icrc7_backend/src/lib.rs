@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use candid::Principal;
 use common::{
     guards::not_anonymous_caller,
-    types::{Account, Event, OperationCode, TransferArg, TransferResult},
+    types::{Account, Event, MetadataValue, OperationCode, TransferArg, TransferResult},
 };
 use ic_cdk::call;
 use ic_cdk_macros::export_candid;
@@ -24,6 +24,7 @@ use common::types::{Group, Icrc7TokenMetadata, Member};
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
+
     let factory_canister_id =
         Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =

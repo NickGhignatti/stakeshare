@@ -26,10 +26,6 @@ pub async fn assign_nft_for_event(
         }
     };
 
-    // if metadata.len() > 0 {
-    //     insert_metadata_ipfs(metadata).await;
-    // }
-
     let group_collection = get_collections();
     let group = match group_collection.get(&group_id) {
         Some(g) => g.clone(),
@@ -54,7 +50,7 @@ pub async fn assign_nft_for_event(
             factory_canister_id,
             icrc7_name,
             icrc7_description.clone(),
-            Some(String::from_utf8(metadata.clone()).unwrap_or(String::new())),
+            Some(event_id.clone()),
         )
         .await;
         // updating minting authority, default is on the factory canister

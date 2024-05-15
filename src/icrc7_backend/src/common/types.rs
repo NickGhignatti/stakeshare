@@ -52,6 +52,7 @@ pub struct Event {
     pub id: String,
     pub title: String,
     pub description: String,
+    pub metadata: MetadataValue,
 }
 
 impl Storable for Event {

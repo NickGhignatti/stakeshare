@@ -8,9 +8,16 @@ export const idlFactory = ({ IDL }) => {
     'InsertError' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
     'RetrieveError' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
   });
+  const MetadataValue = IDL.Variant({
+    'Int' : IDL.Int,
+    'Nat' : IDL.Nat,
+    'Blob' : IDL.Vec(IDL.Nat8),
+    'Text' : IDL.Text,
+  });
   const Event = IDL.Record({
     'id' : IDL.Text,
     'title' : IDL.Text,
+    'metadata' : MetadataValue,
     'description' : IDL.Text,
   });
   const Member = IDL.Record({
@@ -20,12 +27,6 @@ export const idlFactory = ({ IDL }) => {
   const Group = IDL.Record({
     'group_members' : IDL.Vec(Member),
     'group_name' : IDL.Text,
-  });
-  const MetadataValue = IDL.Variant({
-    'Int' : IDL.Int,
-    'Nat' : IDL.Nat,
-    'Blob' : IDL.Vec(IDL.Nat8),
-    'Text' : IDL.Text,
   });
   const Account = IDL.Record({
     'owner' : IDL.Principal,
@@ -61,7 +62,7 @@ export const idlFactory = ({ IDL }) => {
         [OperationCode],
         [],
       ),
-    'create_event' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'create_event' : IDL.Func([IDL.Text, IDL.Text, MetadataValue], [], []),
     'get_all_events' : IDL.Func([], [IDL.Vec(Event)], ['query']),
     'get_all_groups' : IDL.Func(
         [],

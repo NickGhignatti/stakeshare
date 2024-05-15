@@ -115,7 +115,23 @@ function App() {
 
   async function createEvent() {
     await agent.fetchRootKey();
-    await backend_webapp.create_event("Standard event", "Trial event");
+    const eventName = (document.getElementById("eventName") as HTMLInputElement)
+      .value;
+    const eventDescription = (document.getElementById("eventD") as HTMLInputElement)
+      .value;
+    // @ts-ignore
+    const file = (document.getElementById("imageForEvent") as HTMLInputElement)
+      .files[0];
+
+    fetch(URL.createObjectURL(file)).then(response => response.blob()).then(blobData => {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const arrayBuffer = event.target?.result as ArrayBuffer;
+        await backend_webapp.create_event(eventName, eventDescription, { 'Blob' : new Uint8Array(arrayBuffer) });
+      }
+      reader.readAsArrayBuffer(blobData);
+    })
+
   }
 
   function showEvents() {
@@ -139,16 +155,13 @@ function App() {
   }
 
   async function getMyCollection() {
-    console.log("Hello!");
     await agent.fetchRootKey();
     await backend_webapp.get_user_collections().then(r => {
-      console.log("mine");
       r.forEach(item => {
         console.log(item[0].toString() + " -> " + item[1].toString());
       })
     });
     await backend_webapp.get_all_nft_collections().then(r => {
-      console.log("all");
       r.forEach(item => {
         console.log(item[0].toString() + " -> " + item[1].toString());
       })
@@ -194,13 +207,16 @@ function App() {
         <label htmlFor="groupId">Enter group_id: &nbsp;</label>
         <input id="groupId" alt="Name" type="text" />
         <input type="file" id="imageN" />
-        <button type="submit">Assign event</button>
+        <button type="submit">Boh</button>
       </form>
-      <section>
-        <button id="evBtn" onClick={createEvent}>
-          Create a test event
-        </button>
-      </section>
+      <form action="#" onSubmit={createEvent}>
+        <label htmlFor="eventName">Enter event name: &nbsp;</label>
+        <input id="eventName" alt="Name" type="text" />
+        <label htmlFor="eventD">Enter description: &nbsp;</label>
+        <input id="eventD" alt="Name" type="text" />
+        <input type="file" id="imageForEvent" />
+        <button type="submit">Create event</button>
+      </form>
       <section>
         <button id="loginBtn" onClick={login}>
           Login with Internet Identity

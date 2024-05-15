@@ -61,6 +61,15 @@ pub fn show_collections() -> HashMap<Principal, Principal> {
     get_collections()
 }
 
+#[ic_cdk::query(guard = "not_anonymous_caller")]
+pub fn get_user_collections(caller: Principal) -> Vec<Principal> {
+    get_collections()
+        .iter()
+        .filter(|(_k, v)| v.to_string() == caller.to_string())
+        .map(|(k, _v)| k.clone())
+        .collect()
+}
+
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn update_minting_aythority(canister_id: Principal, owner: Principal) -> bool {
     let (is_updated,): (bool,) = call(
