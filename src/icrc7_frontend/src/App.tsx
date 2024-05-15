@@ -61,16 +61,7 @@ function App() {
           .value;
         const eventId = (document.getElementById("eventId") as HTMLInputElement)
           .value;
-        // @ts-ignore
-        const image = (document.getElementById("imageN") as HTMLInputElement)
-          .files[0];
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const arrayBuffer = event.target?.result as ArrayBuffer;
-          backend_webapp.assign_event_to_group(eventId, groupId, new Uint8Array(arrayBuffer));
-        }
-        reader.readAsArrayBuffer(image);
+        backend_webapp.assign_event_to_group(eventId, groupId);
       }
     });
   }
@@ -150,22 +141,25 @@ function App() {
       .value;
     await agent.fetchRootKey();
     backend_webapp
-      .assign_event_to_group(eventId, groupId, [])
+      .assign_event_to_group(eventId, groupId)
       .then((s) => console.log(s));
   }
 
   async function getMyCollection() {
     await agent.fetchRootKey();
     await backend_webapp.get_user_collections().then(r => {
+      console.log("Arr = " + r);
       r.forEach(item => {
         console.log(item[0].toString() + " -> " + item[1].toString());
       })
     });
     await backend_webapp.get_all_nft_collections().then(r => {
+      console.log("All items");
       r.forEach(item => {
         console.log(item[0].toString() + " -> " + item[1].toString());
       })
     });
+    backend_webapp.get_user_collection().then(coll => console.log(coll));
   }
 
   async function whoAmI() {

@@ -65,9 +65,9 @@ pub fn show_collections() -> HashMap<Principal, Principal> {
 pub fn get_user_collections(caller: Principal) -> Vec<Principal> {
     get_collections()
         .iter()
-        .filter(|(_k, v)| v.to_string() == caller.to_string())
-        .map(|(k, _v)| k.clone())
-        .collect()
+        .filter(|(_k, v)| *v.to_string() == *caller.to_string())
+        .map(|(k, _v)| (k.clone()))
+        .collect::<Vec<Principal>>()
 }
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]

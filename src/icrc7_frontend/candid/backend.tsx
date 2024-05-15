@@ -58,7 +58,7 @@ export const idlFactory = ({ IDL }) => {
   const Result = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : TransferError });
   return IDL.Service({
     'assign_event_to_group' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Vec(IDL.Nat8)],
+        [IDL.Text, IDL.Text],
         [OperationCode],
         [],
       ),
@@ -130,6 +130,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         ['composite_query'],
       ),
+    'get_user_collection' : IDL.Func([], [IDL.Vec(IDL.Nat)], []),
     'get_user_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],

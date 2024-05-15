@@ -26,7 +26,7 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
 
     let factory_canister_id =
-        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
+        Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai".to_string()).unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =
         match call(factory_canister_id, "show_collections", ()).await {
             Ok(map) => map,
@@ -42,7 +42,7 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_all_nft_collections() -> HashMap<Principal, Principal> {
     let factory_canister_id =
-        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
+        Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai".to_string()).unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =
         match call(factory_canister_id, "show_collections", ()).await {
             Ok(map) => map,
