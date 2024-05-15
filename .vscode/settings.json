@@ -9,6 +9,7 @@
         "memory",
         "event",
         "groups",
-        "ipfs"
+        "ipfs",
+        "environment"
     ]
 }

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use candid::Principal;
 
 use crate::memory::get_collections;
@@ -22,9 +24,11 @@ pub async fn assign_nft_to_group_member(uuid: String) -> OperationCode {
         }
     };
     dotenv().ok();
-    let factory_canister_id =
-        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai".to_string()).unwrap();
-    let app_id = Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai".to_string()).unwrap();
+    let factory_canister_id = Principal::from_str(
+        option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
+    )
+    .unwrap();
+    let app_id = ic_cdk::id();
     for member in group.group_members.clone() {
         let icrc7_name = format!(
             "Commemorative NFT for {} to join {} group!",
