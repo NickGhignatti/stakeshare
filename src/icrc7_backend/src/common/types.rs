@@ -8,6 +8,7 @@ use serde_bytes::ByteBuf;
 #[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
 pub struct Group {
     pub group_name: String,
+    pub group_leader: Account,
     pub group_members: Vec<Member>,
 }
 

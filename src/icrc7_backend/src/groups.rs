@@ -6,7 +6,7 @@ use crate::{
     common::{
         group_utils::assign_nft_to_group_member,
         guards::not_anonymous_caller,
-        types::{Group, Member, RequestResult},
+        types::{Account, Group, Member, RequestResult},
         utils::group_already_present,
         uuid::uuidv4,
     },
@@ -47,6 +47,10 @@ pub async fn subscribe_group(
         group_id.clone(),
         Group {
             group_name: group_name,
+            group_leader: Account {
+                owner: caller(),
+                subaccount: None,
+            },
             group_members: members,
         },
     );
