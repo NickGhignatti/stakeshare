@@ -1,17 +1,15 @@
-# icrc7
+# Icrc7 NFTs management
 
-Welcome to your new icrc7 project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+In this project you can find:
+- An implementation of the Icrc7 standard
+- A factory to create Icrc7 token collection
+- A basic backend dapp to play with this kind of token
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
-
-To learn more before you start working with icrc7, see the following documentation available online:
-
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
+The backend dapp is named StakeShare, it allows a user (previous login with internet identity) to create a group, identified by a uuid4 with a leader, a name and some members in it. 
+Members are basically users, with a name and an internet identity.
+When a group is created a partecipation token is assigned to the group leader and the group members, this ownership of those tokens is assigned at the application, and for the user is not tradable/transferrable.
+Events represent a generic in-real-life event, with an ID (still uuid4), a name and a description.
+When a user/group of user satisfy the requirements of an event, an event token is assigned to each member, the ownership of the token is of the user who received it.
 
 If you want to start working on your project right away, you might want to try the following commands:
 
@@ -27,7 +25,7 @@ If you want to test your project locally, you can use the following commands:
 
 ```bash
 # Starts the replica, running in the background
-dfx start --background
+dfx start  --clean --background
 
 # Deploys your canisters to the replica and generates your candid interface
 dfx deploy
