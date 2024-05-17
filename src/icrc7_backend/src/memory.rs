@@ -5,7 +5,7 @@ use ic_stable_structures::DefaultMemoryImpl;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
-use crate::common::types::{Event, Group, OperationCode};
+use crate::common::types::{Event, Group, RequestResult};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -38,13 +38,14 @@ pub fn remove_entry(group_id: &String) {
     COLLECTIONS.with(|collection| collection.borrow_mut().remove(group_id));
 }
 
-pub fn get_group_by_id(group_id: String) -> Result<Group, OperationCode> {
+pub fn get_group_by_id(group_id: String) -> RequestResult<Group> {
     match COLLECTIONS.with(|collection| collection.borrow().get(&group_id)) {
-        Some(g) => Ok(g),
-        _ => Err(OperationCode::RetrieveError {
-            code: 404,
-            message: format!("Group with ID = {} not found", group_id),
-        }),
+        Some(g) => RequestResult::new(200, format!("Correctly retrieved group {}", group_id), g),
+        _ => RequestResult::new(
+            404,
+            format!("Not found group {}", group_id),
+            Group::default(),
+        ),
     }
 }
 
@@ -60,13 +61,14 @@ pub fn remove_event_from_collection(event_id: String) {
     EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().remove(&event_id));
 }
 
-pub fn get_event_by_id(event_id: String) -> Result<Event, OperationCode> {
+pub fn get_event_by_id(event_id: String) -> RequestResult<Event> {
     match EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().get(&event_id)) {
-        Some(e) => Ok(e),
-        _ => Err(OperationCode::RetrieveError {
-            code: 404,
-            message: format!("Event with ID = {} not found", event_id),
-        }),
+        Some(e) => RequestResult::new(200, format!("Correctly retrieved event {}", event_id), e),
+        _ => RequestResult::new(
+            404,
+            format!("Not found event {}", event_id),
+            Event::default(),
+        ),
     }
 }
 

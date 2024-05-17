@@ -5,7 +5,11 @@ type Event = record {
   metadata : MetadataValue;
   description : text;
 };
-type Group = record { group_members : vec Member; group_name : text };
+type Group = record {
+  group_leader : Account;
+  group_members : vec Member;
+  group_name : text;
+};
 type Member = record { name : text; internet_identity : text };
 type MetadataValue = variant { Int : int; Nat : nat; Blob : blob; Text : text };
 type RequestResult = record { body : vec nat; code : nat16; message : text };
@@ -54,7 +58,7 @@ type TransferError = variant {
   TooOld;
 };
 service : {
-  assign_event_to_group : (text, text) -> (RequestResult);
+  assign_event_to_group : (text, vec Member) -> (RequestResult);
   create_event : (text, text, MetadataValue) -> ();
   get_all_events : () -> (RequestResult_1) query;
   get_all_groups : () -> (RequestResult_2) query;

@@ -12,6 +12,16 @@ pub struct Group {
     pub group_members: Vec<Member>,
 }
 
+impl Group {
+    pub fn default() -> Group {
+        Group {
+            group_name: String::new(),
+            group_leader: Account::empty(),
+            group_members: vec![],
+        }
+    }
+}
+
 impl Storable for Group {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(
@@ -48,12 +58,32 @@ pub struct Account {
     pub subaccount: Option<Subaccount>,
 }
 
+impl Account {
+    pub fn empty() -> Account {
+        Account {
+            owner: Principal::anonymous(),
+            subaccount: None,
+        }
+    }
+}
+
 #[derive(Serialize, CandidType, Deserialize, Clone)]
 pub struct Event {
     pub id: String,
     pub title: String,
     pub description: String,
     pub metadata: MetadataValue,
+}
+
+impl Event {
+    pub fn default() -> Event {
+        Event {
+            id: String::new(),
+            title: String::new(),
+            description: String::new(),
+            metadata: MetadataValue::Text(String::new()),
+        }
+    }
 }
 
 impl Storable for Event {
@@ -140,16 +170,6 @@ pub enum MintError {
     TokenIdMinimumLimit,
     GenericError { error_code: u128, message: String },
     GenericBatchError { error_code: u128, message: String },
-}
-
-#[derive(CandidType, Clone, Debug)]
-pub enum OperationCode {
-    MintOk { code: u16, message: String },
-    RemoveOk { code: u16, message: String },
-    RetrieveError { code: u16, message: String },
-    InsertError { code: u16, message: String },
-    DuplicateEntry { code: u16, message: String },
-    MintingError { code: u16, message: String },
 }
 
 /// Variant type for the `metadata` endpoint values.

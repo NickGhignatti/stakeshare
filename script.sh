@@ -14,5 +14,5 @@ candid-extractor target/wasm32-unknown-unknown/release/factory.wasm > src/factor
 
 # dfx deploy
 
-cp src/declarations/factory/factory.did.js src/icrc7_frontend/candid/factory.tsx
-cp src/declarations/icrc7_backend/icrc7_backend.did.js src/icrc7_frontend/candid/backend.tsx
+# cp src/declarations/factory/factory.did.js src/icrc7_frontend/candid/factory.tsx
+# cp src/declarations/icrc7_backend/icrc7_backend.did.js src/icrc7_frontend/candid/backend.tsx

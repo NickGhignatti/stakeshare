@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use candid::Principal;
 
-use crate::memory::{get_collections, get_events_collection};
+use crate::memory::get_events_collection;
 
 use super::{
-    types::{OperationCode, RequestResult},
+    types::{Member, RequestResult},
     utils::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
 };
 
@@ -13,8 +13,8 @@ use dotenv::dotenv;
 
 pub async fn assign_nft_for_event(
     event_id: String,
-    group_id: String,
     icrc7_description: Option<String>,
+    members: Vec<Member>,
 ) -> RequestResult<Vec<u128>> {
     let event_collection = get_events_collection();
     let event = match event_collection.get(&event_id) {
@@ -27,25 +27,13 @@ pub async fn assign_nft_for_event(
             )
         }
     };
-
-    let group_collection = get_collections();
-    let group = match group_collection.get(&group_id) {
-        Some(g) => g.clone(),
-        _ => {
-            return RequestResult::new(
-                404,
-                format!("Cannot find group with ID = {}", group_id),
-                vec![],
-            )
-        }
-    };
     dotenv().ok();
     let factory_canister_id = Principal::from_str(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     )
     .unwrap();
     let mut token_ids = vec![];
-    for member in group.group_members.clone() {
+    for member in members {
         let icrc7_name = format!(
             "Commemorative NFT for {} to partecipate at the event {}!",
             member.name, event.title

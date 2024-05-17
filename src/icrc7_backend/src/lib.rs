@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, str::FromStr};
 
 use candid::Principal;
 use common::{
@@ -24,9 +24,10 @@ use common::types::{Group, Icrc7TokenMetadata, Member};
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_user_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
-
-    let factory_canister_id =
-        Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai".to_string()).unwrap();
+    let factory_canister_id = Principal::from_str(
+        option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
+    )
+    .unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =
         match call(factory_canister_id, "show_collections", ()).await {
             Ok(map) => map,
@@ -41,8 +42,10 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_all_nft_collections() -> HashMap<Principal, Principal> {
-    let factory_canister_id =
-        Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai".to_string()).unwrap();
+    let factory_canister_id = Principal::from_str(
+        option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
+    )
+    .unwrap();
     let (all_collections,): (HashMap<Principal, Principal>,) =
         match call(factory_canister_id, "show_collections", ()).await {
             Ok(map) => map,

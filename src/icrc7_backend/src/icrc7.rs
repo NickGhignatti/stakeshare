@@ -73,14 +73,14 @@ pub async fn get_token_metadata(
             Some(hash_map) => {
                 for (k, v) in hash_map {
                     if k == "logo".to_string() {
-                        let logo_id = match get_icrc7_logo(collection_id).await {
+                        let logo_id = match get_icrc7_logo(collection_id).await.body {
                             Some(path) => path,
                             _ => String::new(),
                         };
-                        resulting_metadata.push(match get_event_by_id(logo_id) {
-                            Ok(e) => e.metadata.clone(),
-                            _ => MetadataValue::Text("No image found".to_string()),
-                        })
+                        let event = get_event_by_id(logo_id);
+                        if event.code == 200 {
+                            resulting_metadata.push(event.body.metadata)
+                        }
                     } else {
                         resulting_metadata.push(v)
                     }

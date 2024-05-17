@@ -22,10 +22,7 @@ use crate::{
 /// * `group` group to add in the collection
 ///
 /// ### return
-/// * `400` if there is already a group with the same name
-/// * `404` if there is no group with that name
-/// * `499` if there has been a minting error for a certain member
-/// * `200` if everything is ok
+/// * A request result containing the operation result code, a message and the vector of tokens minted
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn subscribe_group(
     mut members: Vec<Member>,
@@ -68,9 +65,9 @@ pub async fn subscribe_group(
 /// * `200` if the remotion gone right
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn remove_group(group_id: String) -> RequestResult<String> {
-    match get_group_by_id(group_id.clone()) {
-        Err(_) => return RequestResult::new(404, "Group not found".to_string(), String::new()),
-        _ => {}
+    let request = get_group_by_id(group_id.clone());
+    if request.code != 200 {
+        return RequestResult::new(request.code, request.message, String::new());
     }
     remove_entry(&group_id);
     RequestResult::new(200, "Delete of the entry ok".to_string(), String::new())

@@ -1,5 +1,9 @@
 // @ts-ignore
 export const idlFactory = ({ IDL }) => {
+  const Member = IDL.Record({
+    'name' : IDL.Text,
+    'internet_identity' : IDL.Text,
+  });
   const RequestResult = IDL.Record({
     'body' : IDL.Vec(IDL.Nat),
     'code' : IDL.Nat16,
@@ -22,11 +26,12 @@ export const idlFactory = ({ IDL }) => {
     'code' : IDL.Nat16,
     'message' : IDL.Text,
   });
-  const Member = IDL.Record({
-    'name' : IDL.Text,
-    'internet_identity' : IDL.Text,
+  const Account = IDL.Record({
+    'owner' : IDL.Principal,
+    'subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
   const Group = IDL.Record({
+    'group_leader' : Account,
     'group_members' : IDL.Vec(Member),
     'group_name' : IDL.Text,
   });
@@ -49,10 +54,6 @@ export const idlFactory = ({ IDL }) => {
     'body' : IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text)),
     'code' : IDL.Nat16,
     'message' : IDL.Text,
-  });
-  const Account = IDL.Record({
-    'owner' : IDL.Principal,
-    'subaccount' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
   const TransferArg = IDL.Record({
     'to' : Account,
@@ -85,7 +86,7 @@ export const idlFactory = ({ IDL }) => {
   });
   return IDL.Service({
     'assign_event_to_group' : IDL.Func(
-        [IDL.Text, IDL.Text],
+        [IDL.Text, IDL.Vec(Member)],
         [RequestResult],
         [],
       ),
