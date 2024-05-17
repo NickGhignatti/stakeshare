@@ -60,6 +60,16 @@ pub fn remove_event_from_collection(event_id: String) {
     EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().remove(&event_id));
 }
 
+pub fn get_event_by_id(event_id: String) -> Result<Event, OperationCode> {
+    match EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().get(&event_id)) {
+        Some(e) => Ok(e),
+        _ => Err(OperationCode::RetrieveError {
+            code: 404,
+            message: format!("Event with ID = {} not found", event_id),
+        }),
+    }
+}
+
 pub fn get_current_token_id() -> u128 {
     TOKEN_COUNTER.with(|token| token.borrow().get().clone())
 }

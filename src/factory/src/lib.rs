@@ -20,7 +20,6 @@ pub mod memory;
 async fn mint_collection_canister(arg: Arg, minting_account: Account) -> Result<Principal, String> {
     // let caller = ic_cdk::caller();
     let account = minting_account;
-    ic_cdk::println!("Account = {}", account.owner.clone());
     let principal = match create_canister(
         CreateCanisterArgument {
             settings: Some(CanisterSettings {

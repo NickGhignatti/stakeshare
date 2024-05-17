@@ -54,7 +54,8 @@ service : {
       vec opt vec record { text; MetadataValue },
     ) composite_query;
   get_icrc7_total_supply : (principal) -> (nat) composite_query;
-  get_user_collection : () -> (vec nat);
+  get_token_metadata : (nat, text) -> (vec record { text; MetadataValue });
+  get_user_collection : () -> (vec record { nat; text });
   get_user_collections : () -> (vec record { principal; principal });
   icrc7_atomic_batch_transfers : (principal) -> (opt bool) composite_query;
   icrc7_balance_of : (vec Account, principal) -> (vec nat) composite_query;

@@ -130,7 +130,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         ['composite_query'],
       ),
-    'get_user_collection' : IDL.Func([], [IDL.Vec(IDL.Nat)], []),
+    'get_token_metadata' : IDL.Func(
+        [IDL.Nat, IDL.Text],
+        [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))],
+        [],
+      ),
+    'get_user_collection' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text))],
+        [],
+      ),
     'get_user_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],

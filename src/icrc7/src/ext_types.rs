@@ -45,7 +45,6 @@ impl TokenIdentifier {
             .unwrap()
             .as_slice()
             .to_vec();
-        // ic_cdk::println!("parse_token_identifier {:?}", array);
         if array.len() <= 4 || &array[0..4] != TDS {
             return (array, 0);
         }
