@@ -3,9 +3,7 @@ use std::collections::HashMap;
 use candid::Principal;
 use common::{
     guards::not_anonymous_caller,
-    types::{
-        Account, Event, MetadataValue, OperationCode, RequestResult, TransferArg, TransferResult,
-    },
+    types::{Account, Event, MetadataValue, RequestResult, TransferArg, TransferResult},
 };
 use ic_cdk::call;
 use ic_cdk_macros::export_candid;

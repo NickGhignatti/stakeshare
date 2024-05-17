@@ -1,12 +1,9 @@
 // @ts-ignore
 export const idlFactory = ({ IDL }) => {
-  const OperationCode = IDL.Variant({
-    'DuplicateEntry' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
-    'MintingError' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
-    'RemoveOk' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
-    'MintOk' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
-    'InsertError' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
-    'RetrieveError' : IDL.Record({ 'code' : IDL.Nat16, 'message' : IDL.Text }),
+  const RequestResult = IDL.Record({
+    'body' : IDL.Vec(IDL.Nat),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
   });
   const MetadataValue = IDL.Variant({
     'Int' : IDL.Int,
@@ -20,6 +17,11 @@ export const idlFactory = ({ IDL }) => {
     'metadata' : MetadataValue,
     'description' : IDL.Text,
   });
+  const RequestResult_1 = IDL.Record({
+    'body' : IDL.Vec(Event),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
   const Member = IDL.Record({
     'name' : IDL.Text,
     'internet_identity' : IDL.Text,
@@ -27,6 +29,26 @@ export const idlFactory = ({ IDL }) => {
   const Group = IDL.Record({
     'group_members' : IDL.Vec(Member),
     'group_name' : IDL.Text,
+  });
+  const RequestResult_2 = IDL.Record({
+    'body' : IDL.Vec(IDL.Tuple(IDL.Text, Group)),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_3 = IDL.Record({
+    'body' : IDL.Vec(Member),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_4 = IDL.Record({
+    'body' : IDL.Vec(MetadataValue),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_5 = IDL.Record({
+    'body' : IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text)),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
   });
   const Account = IDL.Record({
     'owner' : IDL.Principal,
@@ -56,25 +78,26 @@ export const idlFactory = ({ IDL }) => {
     'TooOld' : IDL.Null,
   });
   const Result = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : TransferError });
+  const RequestResult_6 = IDL.Record({
+    'body' : IDL.Text,
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
   return IDL.Service({
     'assign_event_to_group' : IDL.Func(
         [IDL.Text, IDL.Text],
-        [OperationCode],
+        [RequestResult],
         [],
       ),
     'create_event' : IDL.Func([IDL.Text, IDL.Text, MetadataValue], [], []),
-    'get_all_events' : IDL.Func([], [IDL.Vec(Event)], ['query']),
-    'get_all_groups' : IDL.Func(
-        [],
-        [IDL.Vec(IDL.Tuple(IDL.Text, Group))],
-        ['query'],
-      ),
+    'get_all_events' : IDL.Func([], [RequestResult_1], ['query']),
+    'get_all_groups' : IDL.Func([], [RequestResult_2], ['query']),
     'get_all_nft_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
         [],
       ),
-    'get_group_members' : IDL.Func([IDL.Text], [IDL.Vec(Member)], ['query']),
+    'get_group_members' : IDL.Func([IDL.Text], [RequestResult_3], ['query']),
     'get_icrc7_description' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(IDL.Text)],
@@ -130,16 +153,8 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         ['composite_query'],
       ),
-    'get_token_metadata' : IDL.Func(
-        [IDL.Nat, IDL.Text],
-        [IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))],
-        [],
-      ),
-    'get_user_collection' : IDL.Func(
-        [],
-        [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text))],
-        [],
-      ),
+    'get_token_metadata' : IDL.Func([IDL.Nat, IDL.Text], [RequestResult_4], []),
+    'get_user_collection' : IDL.Func([], [RequestResult_5], []),
     'get_user_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
@@ -177,10 +192,10 @@ export const idlFactory = ({ IDL }) => {
       ),
     'remove_all_groups' : IDL.Func([], [], []),
     'remove_event' : IDL.Func([IDL.Text], [], []),
-    'remove_group' : IDL.Func([IDL.Text], [OperationCode], []),
+    'remove_group' : IDL.Func([IDL.Text], [RequestResult_6], []),
     'subscribe_group' : IDL.Func(
         [IDL.Vec(Member), IDL.Text, IDL.Text],
-        [OperationCode],
+        [RequestResult],
         [],
       ),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),

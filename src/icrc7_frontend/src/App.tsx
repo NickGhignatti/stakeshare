@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Principal } from "@dfinity/principal";
 import { AuthClient } from "@dfinity/auth-client";
 import { Actor, HttpAgent, Identity } from "@dfinity/agent";
 import { _SERVICE as _FCTRY_SERVICE } from "../../declarations/factory/factory.did";

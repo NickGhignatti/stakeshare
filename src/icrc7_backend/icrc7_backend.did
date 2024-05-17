@@ -8,14 +8,33 @@ type Event = record {
 type Group = record { group_members : vec Member; group_name : text };
 type Member = record { name : text; internet_identity : text };
 type MetadataValue = variant { Int : int; Nat : nat; Blob : blob; Text : text };
-type OperationCode = variant {
-  DuplicateEntry : record { code : nat16; message : text };
-  MintingError : record { code : nat16; message : text };
-  RemoveOk : record { code : nat16; message : text };
-  MintOk : record { code : nat16; message : text };
-  InsertError : record { code : nat16; message : text };
-  RetrieveError : record { code : nat16; message : text };
+type RequestResult = record { body : vec nat; code : nat16; message : text };
+type RequestResult_1 = record {
+  body : vec Event;
+  code : nat16;
+  message : text;
 };
+type RequestResult_2 = record {
+  body : vec record { text; Group };
+  code : nat16;
+  message : text;
+};
+type RequestResult_3 = record {
+  body : vec Member;
+  code : nat16;
+  message : text;
+};
+type RequestResult_4 = record {
+  body : vec MetadataValue;
+  code : nat16;
+  message : text;
+};
+type RequestResult_5 = record {
+  body : vec record { nat; text };
+  code : nat16;
+  message : text;
+};
+type RequestResult_6 = record { body : text; code : nat16; message : text };
 type Result = variant { Ok : nat; Err : TransferError };
 type TransferArg = record {
   to : Account;
@@ -35,12 +54,12 @@ type TransferError = variant {
   TooOld;
 };
 service : {
-  assign_event_to_group : (text, text) -> (OperationCode);
+  assign_event_to_group : (text, text) -> (RequestResult);
   create_event : (text, text, MetadataValue) -> ();
-  get_all_events : () -> (vec Event) query;
-  get_all_groups : () -> (vec record { text; Group }) query;
+  get_all_events : () -> (RequestResult_1) query;
+  get_all_groups : () -> (RequestResult_2) query;
   get_all_nft_collections : () -> (vec record { principal; principal });
-  get_group_members : (text) -> (vec Member) query;
+  get_group_members : (text) -> (RequestResult_3) query;
   get_icrc7_description : (principal) -> (opt text) composite_query;
   get_icrc7_logo : (principal) -> (opt text) composite_query;
   get_icrc7_max_memo_size : (principal) -> (opt nat) composite_query;
@@ -54,8 +73,8 @@ service : {
       vec opt vec record { text; MetadataValue },
     ) composite_query;
   get_icrc7_total_supply : (principal) -> (nat) composite_query;
-  get_token_metadata : (nat, text) -> (vec record { text; MetadataValue });
-  get_user_collection : () -> (vec record { nat; text });
+  get_token_metadata : (nat, text) -> (RequestResult_4);
+  get_user_collection : () -> (RequestResult_5);
   get_user_collections : () -> (vec record { principal; principal });
   icrc7_atomic_batch_transfers : (principal) -> (opt bool) composite_query;
   icrc7_balance_of : (vec Account, principal) -> (vec nat) composite_query;
@@ -67,7 +86,7 @@ service : {
   icrc7_transfer : (principal, vec TransferArg, principal) -> (vec opt Result);
   remove_all_groups : () -> ();
   remove_event : (text) -> ();
-  remove_group : (text) -> (OperationCode);
-  subscribe_group : (vec Member, text, text) -> (OperationCode);
+  remove_group : (text) -> (RequestResult_6);
+  subscribe_group : (vec Member, text, text) -> (RequestResult);
   whoami : () -> (principal) query;
 }
