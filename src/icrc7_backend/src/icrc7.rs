@@ -3,7 +3,7 @@ use std::{collections::HashMap, str::FromStr};
 use crate::{
     common::{
         guards::not_anonymous_caller,
-        types::{Icrc7TokenMetadata, MetadataValue},
+        types::{Icrc7TokenMetadata, MetadataValue, RequestResult},
     },
     memory::get_event_by_id,
 };
@@ -18,7 +18,7 @@ pub mod query_methods;
 pub mod update_methods;
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn get_user_collection() -> HashMap<u128, String> {
+pub async fn get_user_collection() -> RequestResult<HashMap<u128, String>> {
     let caller = caller();
     dotenv().ok();
     let factory_canister_id = Principal::from_str(
@@ -53,14 +53,14 @@ pub async fn get_user_collection() -> HashMap<u128, String> {
             tokens.insert(t, collection.to_string());
         }
     }
-    tokens
+    RequestResult::new(200, "Use collection found!".to_string(), tokens)
 }
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn get_token_metadata(
     token_id: u128,
     collection_id: String,
-) -> HashMap<String, MetadataValue> {
+) -> RequestResult<Vec<MetadataValue>> {
     let collection_id = Principal::from_text(collection_id).unwrap_or(Principal::anonymous());
     let (token_metadatas,): (Vec<Option<Icrc7TokenMetadata>>,) =
         match call(collection_id, "icrc7_token_metadata", (&[token_id],)).await {
@@ -89,5 +89,5 @@ pub async fn get_token_metadata(
             _ => {}
         }
     }
-    HashMap::new()
+    RequestResult::new(200, "Metadata found!".to_string(), resulting_metadata)
 }

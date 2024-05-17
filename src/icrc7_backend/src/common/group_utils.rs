@@ -5,23 +5,18 @@ use candid::Principal;
 use crate::memory::get_collections;
 
 use super::{
-    types::OperationCode,
+    types::RequestResult,
     utils::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
 };
 
 use dotenv::dotenv;
 
-pub async fn assign_nft_to_group_member(uuid: String) -> OperationCode {
+pub async fn assign_nft_to_group_member(uuid: String) -> RequestResult<Vec<u128>> {
     let collection = get_collections();
     let group = match collection.get(&uuid) {
         Some(group) => group,
         // should never trigger this match arm cause the insertion has been done some lines before
-        _ => {
-            return OperationCode::RetrieveError {
-                code: 404,
-                message: format!("Not found group with id = {}", uuid),
-            }
-        }
+        _ => return RequestResult::new(404, format!("Not found group with id = {}", uuid), vec![]),
     };
     dotenv().ok();
     let factory_canister_id = Principal::from_str(
@@ -29,6 +24,7 @@ pub async fn assign_nft_to_group_member(uuid: String) -> OperationCode {
     )
     .unwrap();
     let app_id = ic_cdk::id();
+    let mut minted_token: Vec<u128> = vec![];
     for member in group.group_members.clone() {
         let icrc7_name = format!(
             "Commemorative NFT for {} to join {} group!",
@@ -45,19 +41,16 @@ pub async fn assign_nft_to_group_member(uuid: String) -> OperationCode {
         .await
         {
             Err(_) => {
-                return OperationCode::MintingError {
-                    code: 499,
-                    message: format!(
-                        "Minting error for the user = {}",
-                        member.internet_identity.clone()
-                    ),
-                }
+                return RequestResult::new(
+                    499,
+                    format!("Error minting token for {}", member.name.clone()),
+                    vec![],
+                )
             }
-            _ => {}
+            Ok(id) => {
+                minted_token.push(id);
+            }
         };
     }
-    OperationCode::MintOk {
-        code: 200,
-        message: format!("Minting done for the group {}", group.group_name.clone()),
-    }
+    RequestResult::new(200, "All NFTs has been minted".to_string(), minted_token)
 }

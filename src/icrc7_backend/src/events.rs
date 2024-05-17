@@ -2,7 +2,7 @@ use crate::{
     common::{
         event_utils::assign_nft_for_event,
         guards::not_anonymous_caller,
-        types::{Event, MetadataValue, OperationCode},
+        types::{Event, MetadataValue, RequestResult},
         uuid::uuidv4,
     },
     memory::{get_events_collection, insert_event_in_collection, remove_event_from_collection},
@@ -30,11 +30,15 @@ pub fn create_event(name: String, description: String, metadata: MetadataValue) 
 /// ### return
 /// * A vector of events with all the events in the collection
 #[ic_cdk::query(guard = "not_anonymous_caller")]
-pub fn get_all_events() -> Vec<Event> {
-    get_events_collection()
-        .iter()
-        .map(|(_k, v)| v.clone())
-        .collect()
+pub fn get_all_events() -> RequestResult<Vec<Event>> {
+    RequestResult::new(
+        200,
+        "All events".to_string(),
+        get_events_collection()
+            .iter()
+            .map(|(_k, v)| v.clone())
+            .collect(),
+    )
 }
 
 /// remove_event
@@ -54,6 +58,6 @@ pub fn remove_event(event_id: String) {
 /// * `event_id` String representing the event ID
 /// * `group_id` String representing the group ID
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn assign_event_to_group(event_id: String, group_id: String) -> OperationCode {
+pub async fn assign_event_to_group(event_id: String, group_id: String) -> RequestResult<Vec<u128>> {
     assign_nft_for_event(event_id, group_id, Some("Basic description".to_string())).await
 }

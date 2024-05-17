@@ -160,4 +160,21 @@ pub enum MetadataValue {
     Blob(ByteBuf),
 }
 
+#[derive(CandidType, Clone, Debug)]
+pub struct RequestResult<T> {
+    pub code: u16,
+    pub message: String,
+    pub body: T,
+}
+
+impl<T> RequestResult<T> {
+    pub fn new(code: u16, message: String, body: T) -> RequestResult<T> {
+        RequestResult {
+            code: code,
+            message: message,
+            body: body,
+        }
+    }
+}
+
 pub type Icrc7TokenMetadata = HashMap<String, MetadataValue>;

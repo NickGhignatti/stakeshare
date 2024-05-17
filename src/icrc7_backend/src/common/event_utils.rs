@@ -5,7 +5,7 @@ use candid::Principal;
 use crate::memory::{get_collections, get_events_collection};
 
 use super::{
-    types::OperationCode,
+    types::{OperationCode, RequestResult},
     utils::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
 };
 
@@ -15,15 +15,16 @@ pub async fn assign_nft_for_event(
     event_id: String,
     group_id: String,
     icrc7_description: Option<String>,
-) -> OperationCode {
+) -> RequestResult<Vec<u128>> {
     let event_collection = get_events_collection();
     let event = match event_collection.get(&event_id) {
         Some(e) => e.clone(),
         _ => {
-            return OperationCode::RetrieveError {
-                code: 404,
-                message: format!("Cannot find event with ID = {}", event_id),
-            }
+            return RequestResult::new(
+                404,
+                format!("Cannot find event with ID = {}", event_id),
+                vec![],
+            )
         }
     };
 
@@ -31,10 +32,11 @@ pub async fn assign_nft_for_event(
     let group = match group_collection.get(&group_id) {
         Some(g) => g.clone(),
         _ => {
-            return OperationCode::RetrieveError {
-                code: 404,
-                message: format!("Error while finding the group with ID = {}", group_id),
-            }
+            return RequestResult::new(
+                404,
+                format!("Cannot find group with ID = {}", group_id),
+                vec![],
+            )
         }
     };
     dotenv().ok();
@@ -42,6 +44,7 @@ pub async fn assign_nft_for_event(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     )
     .unwrap();
+    let mut token_ids = vec![];
     for member in group.group_members.clone() {
         let icrc7_name = format!(
             "Commemorative NFT for {} to partecipate at the event {}!",
@@ -59,21 +62,19 @@ pub async fn assign_nft_for_event(
         // updating minting authority, default is on the factory canister
         update_minting_authority(factory_canister_id, owner.clone(), icrc7_canister_id).await;
         match mint_icrc7_for_user(owner.clone(), icrc7_canister_id).await {
-            Ok(_value) => {}
+            Ok(v) => token_ids.push(v),
             Err(err) => {
-                return OperationCode::MintingError {
-                    code: 499,
-                    message: format!(
+                return RequestResult::new(
+                    499,
+                    format!(
                         "Error minting NFT for user {} : {:?}",
                         member.name.clone(),
                         err
                     ),
-                }
+                    vec![],
+                )
             }
         };
     }
-    OperationCode::MintOk {
-        code: 200,
-        message: format!("NFT assignment for the event ({}) done", event_id),
-    }
+    RequestResult::new(200, "All NFTs has been minted".to_string(), token_ids)
 }
