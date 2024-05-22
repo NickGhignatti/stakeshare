@@ -10,6 +10,7 @@
         "event",
         "groups",
         "ipfs",
-        "environment"
+        "environment",
+        "doc"
     ]
 }

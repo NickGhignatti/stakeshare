@@ -11,10 +11,21 @@ When a group is created a partecipation token is assigned to the group leader an
 Events represent a generic in-real-life event, with an ID (still uuid4), a name and a description.
 When a user/group of user satisfy the requirements of an event, an event token is assigned to each member, the ownership of the token is of the user who received it.
 
+All the functions in the backend have the same return type `RequestResult`, inspired by the standard Http response. This custom type is composed from a `code`, a `message` and a `body`, the body is a `generic` type, and contains what the function should return, the code and the message are a `BigInt` and a `String`.
+
+Follows the table with the possible result code:
+| Code | Meaning |
+| ---- | ------- |
+| 200  | All fine, the request went fine |
+| 400  | Duplicate entry |
+| 404  | The resource could not be find |
+| 499  | Error while minting the NFT |
+
 If you want to start working on your project right away, you might want to try the following commands:
 
 ```bash
-cd icrc7/
+# TODO
+cd <project_mname>/
 dfx help
 dfx canister --help
 ```
@@ -26,6 +37,9 @@ If you want to test your project locally, you can use the following commands:
 ```bash
 # Starts the replica, running in the background
 dfx start  --clean --background
+
+# Compile all the packages and create the interface
+./script.sh > /dev/null 2>&1
 
 # Deploys your canisters to the replica and generates your candid interface
 dfx deploy
