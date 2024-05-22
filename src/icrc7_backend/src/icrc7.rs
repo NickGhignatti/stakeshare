@@ -16,7 +16,7 @@ use std::collections::HashMap;
 pub mod query_methods;
 pub mod update_methods;
 
-#[ic_cdk::update(guard = "not_anonymous_caller")]
+#[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_user_tokens_collection() -> RequestResult<HashMap<u128, String>> {
     let caller = caller();
     dotenv().ok();
@@ -58,7 +58,7 @@ pub async fn get_user_tokens_collection() -> RequestResult<HashMap<u128, String>
     )
 }
 
-#[ic_cdk::update(guard = "not_anonymous_caller")]
+#[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_token_metadata(
     token_id: u128,
     collection_id: String,
@@ -103,7 +103,7 @@ pub async fn get_token_metadata(
 ///
 /// ### return
 /// * Hashmap containing Principal of the collection and Principal of the owner
-#[ic_cdk::update(guard = "not_anonymous_caller")]
+#[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
     let factory_canister_id = slice_to_principal(
@@ -121,8 +121,9 @@ pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
         .collect::<HashMap<Principal, Principal>>()
 }
 
-#[ic_cdk::update(guard = "not_anonymous_caller")]
+#[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_all_icrc7_collections() -> HashMap<Principal, Principal> {
+    ic_cdk::println!("Inside the function!");
     let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );

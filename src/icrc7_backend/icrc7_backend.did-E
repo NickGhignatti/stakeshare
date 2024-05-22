@@ -87,43 +87,43 @@ service : {
   get_all_groups : () -> (RequestResult_2) query;
   get_all_icrc7_collections : () -> (
       vec record { principal; principal },
-    ) query;
+    ) composite_query;
   get_group_members : (text) -> (RequestResult_3) query;
-  get_icrc7_description : (principal) -> (RequestResult_4) query;
-  get_icrc7_logo : (principal) -> (RequestResult_4) query;
-  get_icrc7_max_memo_size : (principal) -> (RequestResult_5) query;
+  get_icrc7_description : (principal) -> (RequestResult_4) composite_query;
+  get_icrc7_logo : (principal) -> (RequestResult_4) composite_query;
+  get_icrc7_max_memo_size : (principal) -> (RequestResult_5) composite_query;
   get_icrc7_max_query_batch_size : (principal) -> (
       RequestResult_5,
-    ) query;
-  get_icrc7_max_take_value : (principal) -> (RequestResult_5) query;
+    ) composite_query;
+  get_icrc7_max_take_value : (principal) -> (RequestResult_5) composite_query;
   get_icrc7_max_update_batch_size : (principal) -> (
       RequestResult_5,
-    ) query;
-  get_icrc7_name : (principal) -> (RequestResult_6) query;
-  get_icrc7_supply_cap : (principal) -> (RequestResult_5) query;
-  get_icrc7_symbol : (principal) -> (RequestResult_6) query;
+    ) composite_query;
+  get_icrc7_name : (principal) -> (RequestResult_6) composite_query;
+  get_icrc7_supply_cap : (principal) -> (RequestResult_5) composite_query;
+  get_icrc7_symbol : (principal) -> (RequestResult_6) composite_query;
   get_icrc7_token_metadata : (vec nat, principal) -> (
       RequestResult_7,
-    ) query;
-  get_icrc7_total_supply : (principal) -> (RequestResult_8) query;
-  get_token_metadata : (nat, text) -> (RequestResult_9) query;
+    ) composite_query;
+  get_icrc7_total_supply : (principal) -> (RequestResult_8) composite_query;
+  get_token_metadata : (nat, text) -> (RequestResult_9) composite_query;
   get_user_icrc7_collections : () -> (
       vec record { principal; principal },
-    ) query;
-  get_user_tokens_collection : () -> (RequestResult_10) query;
+    ) composite_query;
+  get_user_tokens_collection : () -> (RequestResult_10) composite_query;
   icrc7_atomic_batch_transfers : (principal) -> (
       RequestResult_11,
-    ) query;
+    ) composite_query;
   icrc7_balance_of : (vec Account, principal) -> (
       RequestResult,
-    ) query;
-  icrc7_owner_of : (vec nat, principal) -> (RequestResult_12) query;
+    ) composite_query;
+  icrc7_owner_of : (vec nat, principal) -> (RequestResult_12) composite_query;
   icrc7_tokens : (opt nat, opt nat, principal) -> (
       RequestResult,
-    ) query;
+    ) composite_query;
   icrc7_tokens_of : (Account, opt nat, opt nat, principal) -> (
       RequestResult,
-    ) query;
+    ) composite_query;
   icrc7_transfer : (principal, vec TransferArg, principal) -> (
       RequestResult_13,
     );
