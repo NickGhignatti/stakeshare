@@ -10,6 +10,7 @@ use super::{
 
 use dotenv::dotenv;
 
+// function to assign NFTs to all the members who achieved an event
 pub async fn assign_nft_for_event(
     event_id: String,
     icrc7_description: Option<String>,
@@ -27,7 +28,7 @@ pub async fn assign_nft_for_event(
         }
     };
     dotenv().ok();
-    // getting the factory canister principal to create the collection
+    // getting the factory canister principal to create the collection, giving it to the user
     let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );
@@ -41,9 +42,9 @@ pub async fn assign_nft_for_event(
         let icrc7_canister_id = create_icrc7_collection(
             owner.clone(),
             factory_canister_id,
-            icrc7_name,
+            icrc7_name.clone(),
             icrc7_description.clone(),
-            Some(event_id.clone()),
+            Some(event_id.clone()), // the logo will contain the event id to save memory
         )
         .await;
         // updating minting authority, default is on the factory canister
@@ -51,6 +52,7 @@ pub async fn assign_nft_for_event(
         match mint_icrc7_for_user(
             owner.clone(),
             icrc7_canister_id,
+            Some(icrc7_name),
             icrc7_description.clone(),
             Some(event_id.clone()),
         )

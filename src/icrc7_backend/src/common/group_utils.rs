@@ -30,12 +30,14 @@ pub async fn assign_nft_to_group_member(uuid: String) -> RequestResult<Vec<u128>
             member.name, group.group_name
         );
         let icrc7_canister_id =
-            create_icrc7_collection(app_id, factory_canister_id, icrc7_name, None, None).await;
-        // updating minting authority, default is on the factory canister
+            create_icrc7_collection(app_id, factory_canister_id, icrc7_name.clone(), None, None)
+                .await;
+        // updating minting authority, default is on the factory canister, giving it to the dapp backend canister
         update_minting_authority(factory_canister_id, app_id, icrc7_canister_id).await;
         match mint_icrc7_for_user(
             string_to_principal(member.internet_identity.clone()),
             icrc7_canister_id,
+            Some(icrc7_name),
             None,
             None,
         )
