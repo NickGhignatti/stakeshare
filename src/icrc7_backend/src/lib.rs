@@ -22,7 +22,7 @@ use common::types::{Group, Icrc7TokenMetadata, Member};
 /// ### return
 /// * Hashmap containing Principal of the collection and Principal of the owner
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn get_user_collections() -> HashMap<Principal, Principal> {
+pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
     let factory_canister_id = Principal::from_str(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
@@ -41,7 +41,7 @@ pub async fn get_user_collections() -> HashMap<Principal, Principal> {
 }
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn get_all_nft_collections() -> HashMap<Principal, Principal> {
+pub async fn get_all_icrc7_collections() -> HashMap<Principal, Principal> {
     let factory_canister_id = Principal::from_str(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     )

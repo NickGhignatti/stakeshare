@@ -1,12 +1,11 @@
-use std::str::FromStr;
-
-use candid::Principal;
-
 use crate::memory::get_collections;
 
 use super::{
     types::RequestResult,
-    utils::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
+    utils::{
+        create_icrc7_collection, mint_icrc7_for_user, slice_to_principal, string_to_principal,
+        update_minting_authority,
+    },
 };
 
 use dotenv::dotenv;
@@ -19,10 +18,9 @@ pub async fn assign_nft_to_group_member(uuid: String) -> RequestResult<Vec<u128>
         _ => return RequestResult::new(404, format!("Not found group with id = {}", uuid), vec![]),
     };
     dotenv().ok();
-    let factory_canister_id = Principal::from_str(
+    let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
-    )
-    .unwrap();
+    );
     let app_id = ic_cdk::id();
     let mut minted_token: Vec<u128> = vec![];
     for member in group.group_members.clone() {
@@ -35,7 +33,7 @@ pub async fn assign_nft_to_group_member(uuid: String) -> RequestResult<Vec<u128>
         // updating minting authority, default is on the factory canister
         update_minting_authority(factory_canister_id, app_id, icrc7_canister_id).await;
         match mint_icrc7_for_user(
-            Principal::from_text(member.internet_identity.clone()).unwrap(),
+            string_to_principal(member.internet_identity.clone()),
             icrc7_canister_id,
         )
         .await

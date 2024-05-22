@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use candid::Principal;
 use ic_cdk::call;
 
@@ -93,6 +95,20 @@ pub fn group_already_present(name: String) -> bool {
         .filter(|(_k, v)| v.group_name.clone() == name)
         .count()
         > 0
+}
+
+pub fn string_to_principal(principal: String) -> Principal {
+    match Principal::from_text(principal) {
+        Ok(p) => p,
+        _ => Principal::anonymous(),
+    }
+}
+
+pub fn slice_to_principal(principal: &str) -> Principal {
+    match Principal::from_str(principal) {
+        Ok(p) => p,
+        _ => Principal::anonymous(),
+    }
 }
 
 // pub async fn insert_metadata_ipfs(metadata: Vec<u8>) {

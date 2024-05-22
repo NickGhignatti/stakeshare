@@ -1,12 +1,11 @@
-use std::str::FromStr;
-
-use candid::Principal;
-
 use crate::memory::get_events_collection;
 
 use super::{
     types::{Member, RequestResult},
-    utils::{create_icrc7_collection, mint_icrc7_for_user, update_minting_authority},
+    utils::{
+        create_icrc7_collection, mint_icrc7_for_user, slice_to_principal, string_to_principal,
+        update_minting_authority,
+    },
 };
 
 use dotenv::dotenv;
@@ -28,17 +27,16 @@ pub async fn assign_nft_for_event(
         }
     };
     dotenv().ok();
-    let factory_canister_id = Principal::from_str(
+    let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
-    )
-    .unwrap();
+    );
     let mut token_ids = vec![];
     for member in members {
         let icrc7_name = format!(
             "Commemorative NFT for {} to partecipate at the event {}!",
             member.name, event.title
         );
-        let owner = Principal::from_text(member.internet_identity.clone()).unwrap();
+        let owner = string_to_principal(member.internet_identity.clone());
         let icrc7_canister_id = create_icrc7_collection(
             owner.clone(),
             factory_canister_id,

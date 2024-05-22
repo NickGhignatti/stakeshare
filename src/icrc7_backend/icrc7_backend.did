@@ -18,6 +18,26 @@ type RequestResult_1 = record {
   code : nat16;
   message : text;
 };
+type RequestResult_10 = record {
+  body : vec record { nat; text };
+  code : nat16;
+  message : text;
+};
+type RequestResult_11 = record {
+  body : opt bool;
+  code : nat16;
+  message : text;
+};
+type RequestResult_12 = record {
+  body : vec opt Account;
+  code : nat16;
+  message : text;
+};
+type RequestResult_13 = record {
+  body : vec opt Result;
+  code : nat16;
+  message : text;
+};
 type RequestResult_2 = record {
   body : vec record { text; Group };
   code : nat16;
@@ -28,17 +48,20 @@ type RequestResult_3 = record {
   code : nat16;
   message : text;
 };
-type RequestResult_4 = record {
+type RequestResult_4 = record { body : opt text; code : nat16; message : text };
+type RequestResult_5 = record { body : opt nat; code : nat16; message : text };
+type RequestResult_6 = record { body : text; code : nat16; message : text };
+type RequestResult_7 = record {
+  body : vec opt vec record { text; MetadataValue };
+  code : nat16;
+  message : text;
+};
+type RequestResult_8 = record { body : nat; code : nat16; message : text };
+type RequestResult_9 = record {
   body : vec MetadataValue;
   code : nat16;
   message : text;
 };
-type RequestResult_5 = record {
-  body : vec record { nat; text };
-  code : nat16;
-  message : text;
-};
-type RequestResult_6 = record { body : text; code : nat16; message : text };
 type Result = variant { Ok : nat; Err : TransferError };
 type TransferArg = record {
   to : Account;
@@ -62,34 +85,46 @@ service : {
   create_event : (text, text, MetadataValue) -> ();
   get_all_events : () -> (RequestResult_1) query;
   get_all_groups : () -> (RequestResult_2) query;
-  get_all_nft_collections : () -> (vec record { principal; principal });
+  get_all_icrc7_collections : () -> (vec record { principal; principal });
   get_group_members : (text) -> (RequestResult_3) query;
-  get_icrc7_description : (principal) -> (opt text) composite_query;
-  get_icrc7_logo : (principal) -> (opt text) composite_query;
-  get_icrc7_max_memo_size : (principal) -> (opt nat) composite_query;
-  get_icrc7_max_query_batch_size : (principal) -> (opt nat) composite_query;
-  get_icrc7_max_take_value : (principal) -> (opt nat) composite_query;
-  get_icrc7_max_update_batch_size : (principal) -> (opt nat) composite_query;
-  get_icrc7_name : (principal) -> (text) composite_query;
-  get_icrc7_supply_cap : (principal) -> (opt nat) composite_query;
-  get_icrc7_symbol : (principal) -> (text) composite_query;
+  get_icrc7_description : (principal) -> (RequestResult_4) composite_query;
+  get_icrc7_logo : (principal) -> (RequestResult_4) composite_query;
+  get_icrc7_max_memo_size : (principal) -> (RequestResult_5) composite_query;
+  get_icrc7_max_query_batch_size : (principal) -> (
+      RequestResult_5,
+    ) composite_query;
+  get_icrc7_max_take_value : (principal) -> (RequestResult_5) composite_query;
+  get_icrc7_max_update_batch_size : (principal) -> (
+      RequestResult_5,
+    ) composite_query;
+  get_icrc7_name : (principal) -> (RequestResult_6) composite_query;
+  get_icrc7_supply_cap : (principal) -> (RequestResult_5) composite_query;
+  get_icrc7_symbol : (principal) -> (RequestResult_6) composite_query;
   get_icrc7_token_metadata : (vec nat, principal) -> (
-      vec opt vec record { text; MetadataValue },
+      RequestResult_7,
     ) composite_query;
-  get_icrc7_total_supply : (principal) -> (nat) composite_query;
-  get_token_metadata : (nat, text) -> (RequestResult_4);
-  get_user_collection : () -> (RequestResult_5);
-  get_user_collections : () -> (vec record { principal; principal });
-  icrc7_atomic_batch_transfers : (principal) -> (opt bool) composite_query;
-  icrc7_balance_of : (vec Account, principal) -> (vec nat) composite_query;
-  icrc7_owner_of : (vec nat, principal) -> (vec opt Account) composite_query;
-  icrc7_tokens : (opt nat, opt nat, principal) -> (vec nat) composite_query;
+  get_icrc7_total_supply : (principal) -> (RequestResult_8) composite_query;
+  get_token_metadata : (nat, text) -> (RequestResult_9);
+  get_user_icrc7_collections : () -> (vec record { principal; principal });
+  get_user_tokens_collection : () -> (RequestResult_10);
+  icrc7_atomic_batch_transfers : (principal) -> (
+      RequestResult_11,
+    ) composite_query;
+  icrc7_balance_of : (vec Account, principal) -> (
+      RequestResult,
+    ) composite_query;
+  icrc7_owner_of : (vec nat, principal) -> (RequestResult_12) composite_query;
+  icrc7_tokens : (opt nat, opt nat, principal) -> (
+      RequestResult,
+    ) composite_query;
   icrc7_tokens_of : (Account, opt nat, opt nat, principal) -> (
-      vec nat,
+      RequestResult,
     ) composite_query;
-  icrc7_transfer : (principal, vec TransferArg, principal) -> (vec opt Result);
+  icrc7_transfer : (principal, vec TransferArg, principal) -> (
+      RequestResult_13,
+    );
   remove_all_groups : () -> ();
-  remove_event : (text) -> ();
+  remove_event : (text) -> (RequestResult_6);
   remove_group : (text) -> (RequestResult_6);
   subscribe_group : (vec Member, text, text) -> (RequestResult);
   whoami : () -> (principal) query;
