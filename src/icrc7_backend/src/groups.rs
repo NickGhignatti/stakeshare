@@ -23,7 +23,7 @@ use crate::{
 /// * `leader_name` name of the group leader
 /// * `group_name` name of the group
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -65,7 +65,7 @@ pub async fn subscribe_group(
 /// ### arguments
 /// * `group_id` String representing the group ID to remove
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -92,7 +92,7 @@ pub fn remove_all_groups() {
 /// get_all_groups
 /// Return all the groups present in the collection
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -108,7 +108,7 @@ pub fn get_all_groups() -> RequestResult<HashMap<String, Group>> {
 /// ### arguments
 /// * `group_id` String representing the group ID
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened

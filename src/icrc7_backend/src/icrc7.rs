@@ -19,7 +19,7 @@ pub mod update_methods;
 /// get_user_tokens_collection
 /// get the tokens collections of the caller
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -69,11 +69,11 @@ pub async fn get_user_tokens_collection() -> RequestResult<HashMap<u128, String>
 /// get_token_metadata
 /// get the token_metadata given the collection
 ///
-/// ## arguments
+/// ### arguments
 /// * `token_id` ID of the token
 /// * `collection_id` collection which contains the token
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -121,7 +121,7 @@ pub async fn get_token_metadata(
 /// get_user_collections
 /// Return all the ICRC7 NFT collection of the user which call the function
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -144,6 +144,14 @@ pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
         .collect::<HashMap<Principal, Principal>>()
 }
 
+/// get_all_icrc7_collections
+/// Return all the ICRC7 NFT collection stored in the database
+///
+/// ### return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` hashmap containing Principal of the collection and Principal of the owner
 #[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_all_icrc7_collections() -> HashMap<Principal, Principal> {
     let factory_canister_id = slice_to_principal(

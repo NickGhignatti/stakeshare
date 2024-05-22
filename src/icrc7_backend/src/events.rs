@@ -32,7 +32,7 @@ pub fn create_event(name: String, description: String, metadata: MetadataValue) 
 /// get_all_events
 /// Return all the events collection
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -55,7 +55,7 @@ pub fn get_all_events() -> RequestResult<Vec<Event>> {
 /// ### arguments
 /// * `event_id` String representing the event ID
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened
@@ -73,7 +73,7 @@ pub fn remove_event(event_id: String) -> RequestResult<String> {
 /// * `event_id` String representing the event ID
 /// * `members` Vector of members which should receive
 ///
-/// ## return
+/// ### return
 /// Return a custom type containing
 /// * `code` numerical code with the result code
 /// * `message` a message describing what happened

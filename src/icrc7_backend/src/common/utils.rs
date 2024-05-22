@@ -72,7 +72,7 @@ pub async fn mint_icrc7_for_user(
     icrc7_description: Option<String>,
     icrc7_logo: Option<String>,
 ) -> MintResult {
-    let account = super::types::Account {
+    let account = Account {
         owner: owner,
         subaccount: None,
     };
