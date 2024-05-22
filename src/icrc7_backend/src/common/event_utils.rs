@@ -27,6 +27,7 @@ pub async fn assign_nft_for_event(
         }
     };
     dotenv().ok();
+    // getting the factory canister principal to create the collection
     let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );

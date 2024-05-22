@@ -19,14 +19,19 @@ use crate::{
 /// - assign a welcome NFT to each the memebers of the group
 ///
 /// ### arguments
-/// * `group` group to add in the collection
+/// * `members` vector containing the memebers of the group
+/// * `leader_name` name of the group leader
+/// * `group_name` name of the group
 ///
-/// ### return
-/// * A request result containing the operation result code, a message and the vector of tokens minted
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` vector containing the token IDs of the NFTs minted
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub async fn subscribe_group(
     mut members: Vec<Member>,
-    chef_name: String,
+    leader_name: String,
     group_name: String,
 ) -> RequestResult<Vec<u128>> {
     if group_already_present(group_name.clone()) {
@@ -36,7 +41,7 @@ pub async fn subscribe_group(
     members.insert(
         members.len(),
         Member {
-            name: chef_name,
+            name: leader_name,
             internet_identity: caller().to_string(),
         },
     );
@@ -58,11 +63,13 @@ pub async fn subscribe_group(
 /// Remove a group given a specific id
 ///
 /// ### arguments
-/// * `group_id` String representing the group ID
+/// * `group_id` String representing the group ID to remove
 ///
-/// ### return
-/// * `404` if the group is not found
-/// * `200` if the remotion gone right
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` generic string describing the result
 #[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn remove_group(group_id: String) -> RequestResult<String> {
     let request = get_group_by_id(group_id.clone());
@@ -85,8 +92,11 @@ pub fn remove_all_groups() {
 /// get_all_groups
 /// Return all the groups present in the collection
 ///
-/// ### return
-/// * HashMap containing the tuple ID of the group and the group itself
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` hashmap containing the id of the group and the group itself
 #[ic_cdk::query(guard = "not_anonymous_caller")]
 pub fn get_all_groups() -> RequestResult<HashMap<String, Group>> {
     RequestResult::new(200, "All gorups".to_string(), get_collections())
@@ -98,8 +108,11 @@ pub fn get_all_groups() -> RequestResult<HashMap<String, Group>> {
 /// ### arguments
 /// * `group_id` String representing the group ID
 ///
-/// ### return
-/// * vector containing all the memebers of a group
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` vector containing all the members of the group
 #[ic_cdk::query(guard = "not_anonymous_caller")]
 pub fn get_group_members(group_id: String) -> RequestResult<Vec<Member>> {
     RequestResult::new(

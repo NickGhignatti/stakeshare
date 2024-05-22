@@ -7,6 +7,8 @@ use crate::memory::{get_collections, get_current_token_id, increase_token_id};
 
 use super::types::{Account, Arg, MintArg, MintResult};
 
+// function to update the minting authority on a callection
+// the function call an update method on the collection and return if the operation went right
 pub async fn update_minting_authority(
     factory_id: Principal,
     owner: Principal,
@@ -19,6 +21,7 @@ pub async fn update_minting_authority(
     is_up
 }
 
+// the function create an icrc7 collection canister by calling a factory
 pub async fn create_icrc7_collection(
     owner: Principal,
     factory_id: Principal,
@@ -60,6 +63,8 @@ pub async fn create_icrc7_collection(
     }
 }
 
+// function to min an icrc7 token for a specific user (that will be the owner)
+// the function call the mint method on a collection
 pub async fn mint_icrc7_for_user(
     owner: Principal,
     icrc7_canister_id: Principal,
@@ -94,6 +99,7 @@ pub async fn mint_icrc7_for_user(
     result
 }
 
+// function to check if a group is already present in the database
 pub fn group_already_present(name: String) -> bool {
     get_collections()
         .iter()
@@ -102,6 +108,7 @@ pub fn group_already_present(name: String) -> bool {
         > 0
 }
 
+// convert a string to a principal
 pub fn string_to_principal(principal: String) -> Principal {
     match Principal::from_text(principal) {
         Ok(p) => p,
@@ -109,6 +116,7 @@ pub fn string_to_principal(principal: String) -> Principal {
     }
 }
 
+// convert a string slice to a principal
 pub fn slice_to_principal(principal: &str) -> Principal {
     match Principal::from_str(principal) {
         Ok(p) => p,

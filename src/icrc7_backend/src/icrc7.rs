@@ -16,6 +16,14 @@ use std::collections::HashMap;
 pub mod query_methods;
 pub mod update_methods;
 
+/// get_user_tokens_collection
+/// get the tokens collections of the caller
+///
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` hashmap containing the token id and the collection principal which contains it
 #[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_user_tokens_collection() -> RequestResult<HashMap<u128, String>> {
     let caller = caller();
@@ -58,6 +66,18 @@ pub async fn get_user_tokens_collection() -> RequestResult<HashMap<u128, String>
     )
 }
 
+/// get_token_metadata
+/// get the token_metadata given the collection
+///
+/// ## arguments
+/// * `token_id` ID of the token
+/// * `collection_id` collection which contains the token
+///
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` vector of metadata values of the token
 #[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_token_metadata(
     token_id: u128,
@@ -69,15 +89,11 @@ pub async fn get_token_metadata(
             Ok(meta) => meta,
             _ => (vec![],),
         };
-    ic_cdk::println!("{:?}", token_metadatas);
     let mut resulting_metadata: Vec<MetadataValue> = vec![];
     for metadata in token_metadatas {
         match metadata {
             Some(hash_map) => {
                 for (k, v) in hash_map {
-                    ic_cdk::println!("===================");
-                    ic_cdk::println!("{}", k.clone());
-                    ic_cdk::println!("{:?}", v.clone());
                     if k == "logo".to_string() {
                         let logo_id = match get_icrc7_logo(collection_id).await.body {
                             Some(path) => path,
@@ -105,8 +121,11 @@ pub async fn get_token_metadata(
 /// get_user_collections
 /// Return all the ICRC7 NFT collection of the user which call the function
 ///
-/// ### return
-/// * Hashmap containing Principal of the collection and Principal of the owner
+/// ## return
+/// Return a custom type containing
+/// * `code` numerical code with the result code
+/// * `message` a message describing what happened
+/// * `body` hashmap containing Principal of the collection and Principal of the owner
 #[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
