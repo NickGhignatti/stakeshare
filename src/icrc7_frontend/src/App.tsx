@@ -1,151 +1,23 @@
-import { AuthClient } from "@dfinity/auth-client";
-import { Actor, HttpAgent, Identity } from "@dfinity/agent";
-import { _SERVICE as _FCTRY_SERVICE } from "../../declarations/factory/factory.did";
-import { _SERVICE as _BCKND_SERVICE } from "../../declarations/icrc7_backend/icrc7_backend.did";
-import { idlFactory as BackendIdlFactory } from "../candid/backend";
-import { isSafari } from "react-device-detect";
-
-const authClient = await AuthClient.create();
+import * as Functions from '../utils/functions';
 
 function App() {
-  const backend_webapp_id = process.env.CANISTER_ID_ICRC7_BACKEND;
-  const local_iiUrl = isSafari
-    ? `http://127.0.0.1:4943/?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}`
-    : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943/`;
-
-  let iiUrl = local_iiUrl;
-  if (process.env.DFX_NETWORK === "local") {
-    iiUrl = local_iiUrl;
-  } else if (process.env.DFX_NETWORK === "ic") {
-    iiUrl = `https://${process.env.CANISTER_ID_INTERNET_IDENTITY}.ic0.app`;
-  } else {
-    iiUrl = local_iiUrl;
-  }
-
-  // At this point we're authenticated, and we can get the identity from the auth client:
-  const identity = authClient.getIdentity();
-  // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
-  const agent = new HttpAgent({ identity: identity as unknown as Identity });
-  // Using the interface description of our webapp, we create an actor that we use to call the service methods.
-  const backend_webapp: _BCKND_SERVICE = Actor.createActor(BackendIdlFactory, {
-    agent,
-    canisterId: backend_webapp_id!,
-  });
-
-  async function login() {
-    authClient.isAuthenticated().then(async (isAuth) => {
-      await new Promise<void>((resolve, reject) => {
-        authClient.login({
-          identityProvider: iiUrl,
-          onSuccess: resolve,
-          onError: reject,
-        });
-      });
-    });
-  }
-
-  async function assignEventGroup() {
-    authClient.isAuthenticated().then(async (isAuth) => {
-      await agent.fetchRootKey();
-      if (isAuth) {
-        const eventId = (document.getElementById("eventId") as HTMLInputElement)
-          .value;
-        const nameA = (document.getElementById("nameA") as HTMLInputElement)
-          .value;
-        const idA = (document.getElementById("idA") as HTMLInputElement)
-          .value;
-        backend_webapp.assign_event_to_group(eventId, [{'name': nameA, 'internet_identity': idA}]);
-      }
-    });
-  }
-
-  async function printGroups() {
-    await agent.fetchRootKey();
-    backend_webapp
-      .get_all_groups()
-      .then((groups) => console.log(groups))
-      .catch((e) => console.log(e));
-  }
-
-  async function subscribeGroup() {
-    authClient.isAuthenticated().then(async (isAuth) => {
-      if (isAuth) {
-        await agent.fetchRootKey();
-        const myName = (document.getElementById("name") as HTMLInputElement)
-          .value;
-        const groupName = (
-          document.getElementById("groupName") as HTMLInputElement
-        ).value;
-        const memberName = (
-          document.getElementById("nameMem") as HTMLInputElement
-        ).value;
-        const memberId = (document.getElementById("idMem") as HTMLInputElement)
-          .value;
-        backend_webapp.subscribe_group(
-          [{ name: memberName, internet_identity: memberId }],
-          myName,
-          groupName
-        );
-      }
-    });
-  }
-
-  async function createEvent() {
-    await agent.fetchRootKey();
-    const eventName = (document.getElementById("eventName") as HTMLInputElement)
-      .value;
-    const eventDescription = (
-      document.getElementById("eventD") as HTMLInputElement
-    ).value;
-    // @ts-ignore
-    const file = (document.getElementById("imageForEvent") as HTMLInputElement)
-      .files[0];
-
-    fetch(URL.createObjectURL(file))
-      .then((response) => response.blob())
-      .then((blobData) => {
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-          const arrayBuffer = event.target?.result as ArrayBuffer;
-          await backend_webapp.create_event(eventName, eventDescription, {
-            Blob: new Uint8Array(arrayBuffer),
-          });
-        };
-        reader.readAsArrayBuffer(blobData);
-      });
-  }
-
-  function showEvents() {
-    backend_webapp.get_all_events().then((events) => console.log(events));
-  }
-
-  async function getMyCollection() {
-    await agent.fetchRootKey();
-    backend_webapp.get_all_nft_collections().then((coll) => console.log(coll));
-    backend_webapp.get_user_collection().then((coll) => console.log(coll));
-  }
-
-  async function whoAmI() {
-    await agent.fetchRootKey();
-    backend_webapp.whoami().then((s) => console.log(s.toString()));
-  }
 
   return (
     <main>
       <img src="/logo2.svg" alt="DFINITY logo" />
       <br />
       <br />
-      <form action="#" onSubmit={subscribeGroup}>
+      <form action="#" onSubmit={Functions.subscribeGroup}>
         <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" placeholder="Enter your name" />
+        <input id="leaderName" alt="Name" type="text" placeholder="Enter your name" />
         <input
-          id="nameMem"
+          id="memberName"
           alt="NameMem"
           type="text"
           placeholder="Name of a member"
         />
         <input
-          id="idMem"
+          id="memberId"
           alt="IdMem"
           type="text"
           placeholder="Internet Identity of a member"
@@ -158,14 +30,14 @@ function App() {
         />
         <button type="submit">Subscribe Group!</button>
       </form>
-      <form action="#" onSubmit={assignEventGroup}>
+      <form action="#" onSubmit={Functions.assignEventToGroup}>
         <label htmlFor="eventId">Enter event_id: &nbsp;</label>
         <input id="eventId" alt="Name" type="text" />
-        <input id="nameA" type="text" placeholder="Name of a member" />
-        <input id="idA" type="text" placeholder="II of a member" />
+        <input id="eventMemberName" type="text" placeholder="Name of a member" />
+        <input id="eventMemberId" type="text" placeholder="II of a member" />
         <button type="submit">Assign event to members</button>
       </form>
-      <form action="#" onSubmit={createEvent}>
+      <form action="#" onSubmit={Functions.createEvent}>
         <label htmlFor="eventName">Enter event name: &nbsp;</label>
         <input id="eventName" alt="Name" type="text" />
         <label htmlFor="eventD">Enter description: &nbsp;</label>
@@ -174,27 +46,32 @@ function App() {
         <button type="submit">Create event</button>
       </form>
       <section>
-        <button id="loginBtn" onClick={login}>
+        <button id="loginBtn" onClick={Functions.login}>
           Login with Internet Identity
         </button>
       </section>
       <section>
-        <button id="showGroups" onClick={printGroups}>
+        <button id="showGroups" onClick={Functions.logGroups}>
           Call groups
         </button>
       </section>
       <section>
-        <button id="showGroups" onClick={showEvents}>
+        <button id="showGroups" onClick={Functions.logEvents}>
           E groups
         </button>
       </section>
       <section>
-        <button id="showGroups" onClick={getMyCollection}>
+        <button id="showGroups" onClick={Functions.logAllCollections}>
           C groups
         </button>
       </section>
       <section>
-        <button id="whoAmI" onClick={whoAmI}>
+        <button id="showGroups" onClick={Functions.logUserCollections}>
+          C2 groups
+        </button>
+      </section>
+      <section>
+        <button id="whoAmI" onClick={Functions.whoAmI}>
           WHO AM I
         </button>
       </section>

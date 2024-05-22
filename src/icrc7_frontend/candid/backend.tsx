@@ -46,12 +46,47 @@ export const idlFactory = ({ IDL }) => {
     'message' : IDL.Text,
   });
   const RequestResult_4 = IDL.Record({
-    'body' : IDL.Vec(MetadataValue),
+    'body' : IDL.Opt(IDL.Text),
     'code' : IDL.Nat16,
     'message' : IDL.Text,
   });
   const RequestResult_5 = IDL.Record({
+    'body' : IDL.Opt(IDL.Nat),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_6 = IDL.Record({
+    'body' : IDL.Text,
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_7 = IDL.Record({
+    'body' : IDL.Vec(IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue)))),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_8 = IDL.Record({
+    'body' : IDL.Nat,
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_9 = IDL.Record({
+    'body' : IDL.Vec(MetadataValue),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_10 = IDL.Record({
     'body' : IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text)),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_11 = IDL.Record({
+    'body' : IDL.Opt(IDL.Bool),
+    'code' : IDL.Nat16,
+    'message' : IDL.Text,
+  });
+  const RequestResult_12 = IDL.Record({
+    'body' : IDL.Vec(IDL.Opt(Account)),
     'code' : IDL.Nat16,
     'message' : IDL.Text,
   });
@@ -79,8 +114,8 @@ export const idlFactory = ({ IDL }) => {
     'TooOld' : IDL.Null,
   });
   const Result = IDL.Variant({ 'Ok' : IDL.Nat, 'Err' : TransferError });
-  const RequestResult_6 = IDL.Record({
-    'body' : IDL.Text,
+  const RequestResult_13 = IDL.Record({
+    'body' : IDL.Vec(IDL.Opt(Result)),
     'code' : IDL.Nat16,
     'message' : IDL.Text,
   });
@@ -93,7 +128,7 @@ export const idlFactory = ({ IDL }) => {
     'create_event' : IDL.Func([IDL.Text, IDL.Text, MetadataValue], [], []),
     'get_all_events' : IDL.Func([], [RequestResult_1], ['query']),
     'get_all_groups' : IDL.Func([], [RequestResult_2], ['query']),
-    'get_all_nft_collections' : IDL.Func(
+    'get_all_icrc7_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
         [],
@@ -101,98 +136,98 @@ export const idlFactory = ({ IDL }) => {
     'get_group_members' : IDL.Func([IDL.Text], [RequestResult_3], ['query']),
     'get_icrc7_description' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Text)],
+        [RequestResult_4],
         ['composite_query'],
       ),
     'get_icrc7_logo' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Text)],
+        [RequestResult_4],
         ['composite_query'],
       ),
     'get_icrc7_max_memo_size' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Nat)],
+        [RequestResult_5],
         ['composite_query'],
       ),
     'get_icrc7_max_query_batch_size' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Nat)],
+        [RequestResult_5],
         ['composite_query'],
       ),
     'get_icrc7_max_take_value' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Nat)],
+        [RequestResult_5],
         ['composite_query'],
       ),
     'get_icrc7_max_update_batch_size' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Nat)],
+        [RequestResult_5],
         ['composite_query'],
       ),
     'get_icrc7_name' : IDL.Func(
         [IDL.Principal],
-        [IDL.Text],
+        [RequestResult_6],
         ['composite_query'],
       ),
     'get_icrc7_supply_cap' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Nat)],
+        [RequestResult_5],
         ['composite_query'],
       ),
     'get_icrc7_symbol' : IDL.Func(
         [IDL.Principal],
-        [IDL.Text],
+        [RequestResult_6],
         ['composite_query'],
       ),
     'get_icrc7_token_metadata' : IDL.Func(
         [IDL.Vec(IDL.Nat), IDL.Principal],
-        [IDL.Vec(IDL.Opt(IDL.Vec(IDL.Tuple(IDL.Text, MetadataValue))))],
+        [RequestResult_7],
         ['composite_query'],
       ),
     'get_icrc7_total_supply' : IDL.Func(
         [IDL.Principal],
-        [IDL.Nat],
+        [RequestResult_8],
         ['composite_query'],
       ),
-    'get_token_metadata' : IDL.Func([IDL.Nat, IDL.Text], [RequestResult_4], []),
-    'get_user_collection' : IDL.Func([], [RequestResult_5], []),
-    'get_user_collections' : IDL.Func(
+    'get_token_metadata' : IDL.Func([IDL.Nat, IDL.Text], [RequestResult_9], []),
+    'get_user_icrc7_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
         [],
       ),
+    'get_user_tokens_collection' : IDL.Func([], [RequestResult_10], []),
     'icrc7_atomic_batch_transfers' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Bool)],
+        [RequestResult_11],
         ['composite_query'],
       ),
     'icrc7_balance_of' : IDL.Func(
         [IDL.Vec(Account), IDL.Principal],
-        [IDL.Vec(IDL.Nat)],
+        [RequestResult],
         ['composite_query'],
       ),
     'icrc7_owner_of' : IDL.Func(
         [IDL.Vec(IDL.Nat), IDL.Principal],
-        [IDL.Vec(IDL.Opt(Account))],
+        [RequestResult_12],
         ['composite_query'],
       ),
     'icrc7_tokens' : IDL.Func(
         [IDL.Opt(IDL.Nat), IDL.Opt(IDL.Nat), IDL.Principal],
-        [IDL.Vec(IDL.Nat)],
+        [RequestResult],
         ['composite_query'],
       ),
     'icrc7_tokens_of' : IDL.Func(
         [Account, IDL.Opt(IDL.Nat), IDL.Opt(IDL.Nat), IDL.Principal],
-        [IDL.Vec(IDL.Nat)],
+        [RequestResult],
         ['composite_query'],
       ),
     'icrc7_transfer' : IDL.Func(
         [IDL.Principal, IDL.Vec(TransferArg), IDL.Principal],
-        [IDL.Vec(IDL.Opt(Result))],
+        [RequestResult_13],
         [],
       ),
     'remove_all_groups' : IDL.Func([], [], []),
-    'remove_event' : IDL.Func([IDL.Text], [], []),
+    'remove_event' : IDL.Func([IDL.Text], [RequestResult_6], []),
     'remove_group' : IDL.Func([IDL.Text], [RequestResult_6], []),
     'subscribe_group' : IDL.Func(
         [IDL.Vec(Member), IDL.Text, IDL.Text],
