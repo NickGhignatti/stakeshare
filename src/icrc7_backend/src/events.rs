@@ -5,7 +5,10 @@ use crate::{
         types::{Event, Member, MetadataValue, RequestResult},
         uuid::uuidv4,
     },
-    memory::{get_events_collection, insert_event_in_collection, remove_event_from_collection},
+    memory::{
+        get_event_by_id, get_events_collection, insert_event_in_collection,
+        remove_event_from_collection,
+    },
 };
 
 /// create_event
@@ -63,5 +66,13 @@ pub async fn assign_event_to_group(
     event_id: String,
     members: Vec<Member>,
 ) -> RequestResult<Vec<u128>> {
-    assign_nft_for_event(event_id, Some("Basic description".to_string()), members).await
+    assign_nft_for_event(
+        event_id.clone(),
+        Some(format!(
+            "Commemorative NFT for the event {}",
+            get_event_by_id(event_id).body.title
+        )),
+        members,
+    )
+    .await
 }

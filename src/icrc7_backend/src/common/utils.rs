@@ -60,7 +60,12 @@ pub async fn create_icrc7_collection(
     }
 }
 
-pub async fn mint_icrc7_for_user(owner: Principal, icrc7_canister_id: Principal) -> MintResult {
+pub async fn mint_icrc7_for_user(
+    owner: Principal,
+    icrc7_canister_id: Principal,
+    icrc7_description: Option<String>,
+    icrc7_logo: Option<String>,
+) -> MintResult {
     let account = super::types::Account {
         owner: owner,
         subaccount: None,
@@ -75,8 +80,8 @@ pub async fn mint_icrc7_for_user(owner: Principal, icrc7_canister_id: Principal)
                 token_id: get_current_token_id(),
                 memo: None,
                 token_name: None,
-                token_description: None,
-                token_logo: None,
+                token_description: icrc7_description,
+                token_logo: icrc7_logo,
             },
             owner,
         ),

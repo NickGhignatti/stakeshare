@@ -75,6 +75,9 @@ function App() {
           WHO AM I
         </button>
       </section>
+      <section>
+        <button id="provaTM" onClick={Functions.logUserMetadataColletions}>LOG</button>
+      </section>
     </main>
   );
 }

@@ -69,11 +69,15 @@ pub async fn get_token_metadata(
             Ok(meta) => meta,
             _ => (vec![],),
         };
+    ic_cdk::println!("{:?}", token_metadatas);
     let mut resulting_metadata: Vec<MetadataValue> = vec![];
     for metadata in token_metadatas {
         match metadata {
             Some(hash_map) => {
                 for (k, v) in hash_map {
+                    ic_cdk::println!("===================");
+                    ic_cdk::println!("{}", k.clone());
+                    ic_cdk::println!("{:?}", v.clone());
                     if k == "logo".to_string() {
                         let logo_id = match get_icrc7_logo(collection_id).await.body {
                             Some(path) => path,
@@ -123,7 +127,6 @@ pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
 
 #[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_all_icrc7_collections() -> HashMap<Principal, Principal> {
-    ic_cdk::println!("Inside the function!");
     let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );

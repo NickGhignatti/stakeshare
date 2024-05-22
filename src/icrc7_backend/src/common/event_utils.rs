@@ -47,7 +47,14 @@ pub async fn assign_nft_for_event(
         .await;
         // updating minting authority, default is on the factory canister
         update_minting_authority(factory_canister_id, owner.clone(), icrc7_canister_id).await;
-        match mint_icrc7_for_user(owner.clone(), icrc7_canister_id).await {
+        match mint_icrc7_for_user(
+            owner.clone(),
+            icrc7_canister_id,
+            icrc7_description.clone(),
+            Some(event_id.clone()),
+        )
+        .await
+        {
             Ok(v) => token_ids.push(v),
             Err(err) => {
                 return RequestResult::new(

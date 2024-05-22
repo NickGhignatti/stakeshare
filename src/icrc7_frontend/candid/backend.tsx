@@ -139,11 +139,7 @@ export const idlFactory = ({ IDL }) => {
         [RequestResult_4],
         ['query'],
       ),
-    'get_icrc7_logo' : IDL.Func(
-        [IDL.Principal],
-        [RequestResult_4],
-        ['query'],
-      ),
+    'get_icrc7_logo' : IDL.Func([IDL.Principal], [RequestResult_4], ['query']),
     'get_icrc7_max_memo_size' : IDL.Func(
         [IDL.Principal],
         [RequestResult_5],
@@ -164,11 +160,7 @@ export const idlFactory = ({ IDL }) => {
         [RequestResult_5],
         ['query'],
       ),
-    'get_icrc7_name' : IDL.Func(
-        [IDL.Principal],
-        [RequestResult_6],
-        ['query'],
-      ),
+    'get_icrc7_name' : IDL.Func([IDL.Principal], [RequestResult_6], ['query']),
     'get_icrc7_supply_cap' : IDL.Func(
         [IDL.Principal],
         [RequestResult_5],
@@ -189,13 +181,17 @@ export const idlFactory = ({ IDL }) => {
         [RequestResult_8],
         ['query'],
       ),
-    'get_token_metadata' : IDL.Func([IDL.Nat, IDL.Text], [RequestResult_9], []),
+    'get_token_metadata' : IDL.Func(
+        [IDL.Nat, IDL.Text],
+        [RequestResult_9],
+        ['query'],
+      ),
     'get_user_icrc7_collections' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal))],
-        [],
+        ['query'],
       ),
-    'get_user_tokens_collection' : IDL.Func([], [RequestResult_10], []),
+    'get_user_tokens_collection' : IDL.Func([], [RequestResult_10], ['query']),
     'icrc7_atomic_batch_transfers' : IDL.Func(
         [IDL.Principal],
         [RequestResult_11],

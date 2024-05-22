@@ -100,7 +100,7 @@ export async function logAllCollections() {
   await agent.fetchRootKey();
   backend_webapp
     .get_all_icrc7_collections()
-    .then((c) => console.log(c))
+    .then((c) => c.forEach(e => console.log(e[0] + " -> " + e[1])))
     .catch((e) => console.log(e));
 }
 
@@ -108,7 +108,7 @@ export async function logUserCollections() {
   await agent.fetchRootKey();
   backend_webapp
     .get_user_icrc7_collections()
-    .then((c) => console.log(c))
+    .then((c) => c.forEach(e => console.log(e[0] + " -> " + e[1])))
     .catch((e) => console.log(e));
 }
 
@@ -117,6 +117,22 @@ export async function logUserTokenCollection() {
   backend_webapp
     .get_user_tokens_collection()
     .then((tc) => console.log(tc))
+    .catch((e) => console.log(e));
+}
+
+export async function logUserMetadataColletions() {
+  await agent.fetchRootKey();
+  backend_webapp
+    .get_user_tokens_collection()
+    .then((tc) =>
+      tc.body.forEach((t) => {
+        console.log(t[0] + " -> " + t[1].toString());
+        backend_webapp
+          .get_token_metadata(t[0], t[1])
+          .then((m) => console.log(m))
+          .catch((e) => console.log(e));
+      })
+    )
     .catch((e) => console.log(e));
 }
 

@@ -35,6 +35,8 @@ pub async fn assign_nft_to_group_member(uuid: String) -> RequestResult<Vec<u128>
         match mint_icrc7_for_user(
             string_to_principal(member.internet_identity.clone()),
             icrc7_canister_id,
+            None,
+            None,
         )
         .await
         {
