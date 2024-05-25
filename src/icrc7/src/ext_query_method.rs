@@ -33,9 +33,9 @@ pub fn ext_metadata(token: TokenIdentifier) -> ExtMetadataResult {
 pub fn ext_get_minter() -> Principal {
     let minting_authority = STATE.with(|s| s.borrow().icrc7_minting_authority());
     if let Some(minting_authority_info) = minting_authority {
-        return minting_authority_info.owner;
+        minting_authority_info.owner
     } else {
-        return Principal::anonymous();
+        Principal::anonymous()
     }
 }
 

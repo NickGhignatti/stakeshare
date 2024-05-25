@@ -16,6 +16,7 @@
     "src/icrc7_frontend"
   ],
   "dependencies": {
-    "@dfinity/auth-client": "^1.2.1"
+    "@dfinity/auth-client": "^1.2.1",
+    "react-device-detect": "^2.2.3"
   }
 }

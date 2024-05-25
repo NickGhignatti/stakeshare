@@ -1,22 +1,40 @@
-# icrc7
+# StakeShare
 
-Welcome to your new icrc7 project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+Stakeshare is an application designed to facilitate the management of participation shares in various initiatives, leveraging blockchain notarization to ensure transparency and security. Developed in Rust and compiled into WebAssembly, Stakeshare runs on the Internet Computer Protocol (ICP). This solution enables users to digitally and decentrally register and exchange ownership or participation shares, with legal certification through the NFT standard (ICRC7). By utilizing smart contracts, Stakeshare automates agreements between parties and the distribution of proceeds, making the process of managing shares simpler, safer, and compliant with regulations.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+In this project you can find:
+- An implementation of the `Icrc7` standard
+- A `factory`ß to create Icrc7 token collection
+- A basic backend dapp to play with this kind of token
 
-To learn more before you start working with icrc7, see the following documentation available online:
+The backend allows a user (previous login with internet identity) to create a group, identified by a uuid4 with a leader, a name and some members in it. 
+Members are basically users, with a name and an internet identity.
+When a group is created a partecipation token is assigned to the group leader and the group members, this ownership of those tokens is assigned at the application, and for the user is not tradable/transferrable.
+Events represent a generic in-real-life event, with an ID (still uuid4), a name and a description.
+When a user/group of user satisfy the requirements of an event, an event token is assigned to each member, the ownership of the token is of the user who received it.
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Rust Canister Development Guide](https://internetcomputer.org/docs/current/developer-docs/backend/rust/)
-- [ic-cdk](https://docs.rs/ic-cdk)
-- [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
-- [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
+All the functions in the backend have the same return type `RequestResult`, inspired by the standard Http response. This custom type is composed from a `code`, a `message` and a `body`, the body is a `generic` type, and contains what the function should return, the code and the message are a `BigInt` and a `String`.
+
+Follows the table with the possible result code:
+| Code | Meaning |
+| ---- | ------- |
+| 200  | All fine, the request went fine |
+| 400  | Duplicate entry |
+| 404  | The resource could not be find |
+| 499  | Error while minting the NFT |
+
+
+## Prerequisites
+- `Rust`
+- `NodeJs`
+- `dfx`
+
 
 If you want to start working on your project right away, you might want to try the following commands:
 
 ```bash
-cd icrc7/
+# TODO
+cd stakeshare/
 dfx help
 dfx canister --help
 ```
@@ -27,7 +45,10 @@ If you want to test your project locally, you can use the following commands:
 
 ```bash
 # Starts the replica, running in the background
-dfx start --background
+dfx start  --clean --background
+
+# Compile all the packages and create the interface
+./script.sh > /dev/null 2>&1
 
 # Deploys your canisters to the replica and generates your candid interface
 dfx deploy

@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "module": "esnext",
         "strict": true,
         "target": "ES2020",
         "experimentalDecorators": true,
@@ -7,5 +8,6 @@
         "moduleResolution": "node",
         "allowJs": false,
         "outDir": "HACK_BECAUSE_OF_ALLOW_JS"
-    }
+    },
+    "exclude": ["candid/*"]
 }

@@ -4,6 +4,13 @@
         "dfx_compile",
         "api",
         "structure",
-        "frontend"
+        "frontend",
+        "backend",
+        "memory",
+        "event",
+        "groups",
+        "ipfs",
+        "environment",
+        "doc"
     ]
 }

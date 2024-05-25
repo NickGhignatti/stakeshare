@@ -10,8 +10,8 @@ use crate::{
 use icrc_ledger_types::icrc1::account::Account;
 
 #[ic_cdk::update]
-pub fn icrc7_mint(arg: MintArg) -> MintResult {
-    let caller = ic_cdk::caller();
+pub fn icrc7_mint(arg: MintArg, caller: Principal) -> MintResult {
+    // let caller = ic_cdk::caller();
     if caller == Principal::anonymous() {
         return Err(crate::errors::MintError::GenericBatchError {
             error_code: 100,
@@ -22,8 +22,8 @@ pub fn icrc7_mint(arg: MintArg) -> MintResult {
 }
 
 #[ic_cdk::update]
-pub fn icrc7_transfer(args: Vec<TransferArg>) -> Vec<Option<TransferResult>> {
-    let caller = ic_cdk::caller();
+pub fn icrc7_transfer(args: Vec<TransferArg>, caller: Principal) -> Vec<Option<TransferResult>> {
+    // let caller = ic_cdk::caller();
     STATE.with(|s| s.borrow_mut().icrc7_transfer(&caller, args))
 }
 
@@ -42,7 +42,7 @@ pub fn icrc7_approve(args: Vec<ApprovalArg>) -> Vec<Option<ApproveResult>> {
 #[ic_cdk::update(guard = "owner_guard")]
 pub fn icrc7_set_minting_authority(minting_account: Account) -> bool {
     STATE.with(|s| s.borrow_mut().minting_authority = Some(minting_account));
-    return true;
+    true
 }
 
 #[ic_cdk::update(guard = "owner_guard")]
@@ -52,14 +52,14 @@ pub fn icrc7_set_archive_log_canister(arg: Principal) -> bool {
         state.archive_log_canister = Some(arg);
     });
 
-    return true;
+    true
 }
 
 #[ic_cdk::update(guard = "owner_guard")]
 pub async fn icrc7_archive_logs() -> SyncReceipt {
     let archive_log_canister = STATE
         .with(|s| s.borrow().get_archive_log_canister())
-        .ok_or_else(|| InsertTransactionError::NotSetArchiveCanister)?;
+        .ok_or(InsertTransactionError::NotSetArchiveCanister)?;
 
     // check sync pending
     let sync_pending_txn_ids = STATE.with(|s| s.borrow().get_sync_pending_txn_ids());

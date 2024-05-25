@@ -177,7 +177,7 @@ impl Approval {
     }
 }
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct ApprovalArg {
     pub from_subaccount: Option<Subaccount>,
     pub spender: Account,

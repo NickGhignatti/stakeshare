@@ -7,6 +7,7 @@ use ic_cdk::api::management_canister::{
     main::{create_canister, install_code, CreateCanisterArgument, InstallCodeArgument},
     provisional::CanisterSettings,
 };
+use ic_cdk::call;
 use ic_cdk_macros::export_candid;
 use icrc_ledger_types::icrc1::account::Account;
 use memory::{get_collections, insert_collection};
@@ -16,24 +17,20 @@ pub mod common;
 pub mod memory;
 
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-async fn mint_collection_canister(arg: Arg) -> Result<Principal, String> {
-    let caller = ic_cdk::caller();
-    let account = Account {
-        owner: caller.clone(),
-        subaccount: None,
-    };
-    ic_cdk::println!("{:?}", arg);
+async fn mint_collection_canister(arg: Arg, minting_account: Account) -> Result<Principal, String> {
+    // let caller = ic_cdk::caller();
+    let account = minting_account;
     let principal = match create_canister(
         CreateCanisterArgument {
             settings: Some(CanisterSettings {
-                controllers: Some(vec![ic_cdk::id(), caller.clone()]),
+                controllers: Some(vec![ic_cdk::id(), account.owner]),
                 compute_allocation: None,
                 memory_allocation: None,
                 freezing_threshold: None,
                 reserved_cycles_limit: None,
             }),
         },
-        7_692_307_692 + 6_153_895_378,
+        7_692_307_692 + 6_153_895_378, // Basic cycles amount to create a canister + Basic cycles amount to tip the craeted canister
     )
     .await
     {
@@ -51,7 +48,7 @@ async fn mint_collection_canister(arg: Arg) -> Result<Principal, String> {
     .await
     {
         Ok(()) => {
-            insert_collection(caller.clone(), principal);
+            insert_collection(account.owner, principal);
             Ok(principal)
         }
         Err((code, msg)) => Err(format!("Code: {:?}, Message: {:?}", code, msg)),
@@ -63,23 +60,47 @@ pub fn show_collections() -> HashMap<Principal, Principal> {
     get_collections()
 }
 
+#[ic_cdk::query(guard = "not_anonymous_caller")]
+pub fn get_user_collections(caller: Principal) -> Vec<Principal> {
+    get_collections()
+        .iter()
+        .filter(|(_k, v)| *v.to_string() == *caller.to_string())
+        .map(|(k, _v)| *k)
+        .collect::<Vec<Principal>>()
+}
+
 #[ic_cdk::update(guard = "not_anonymous_caller")]
-pub async fn call_whoami() -> Vec<String> {
-    // let mut whoami_vector: Vec<String> = vec![];
-    // for (k, _v) in get_collections() {
-    //     let (result,): (String,) = call(Principal::from_text(k).unwrap(), "whoami", ())
-    //         .await
-    //         .unwrap();
-    //     ic_cdk::println!("Result of the Factory canister = {}", result);
-    //     whoami_vector.push(result.clone());
-    // }
-    // whoami_vector
-    vec![]
+pub async fn update_minting_aythority(canister_id: Principal, owner: Principal) -> bool {
+    let (is_updated,): (bool,) = call(
+        canister_id,
+        "icrc7_set_minting_authority",
+        (Account {
+            owner,
+            subaccount: None,
+        },),
+    )
+    .await
+    .unwrap();
+
+    is_updated
 }
 
 #[ic_cdk::query(guard = "not_anonymous_caller")]
 pub fn whoami(caller: Principal) -> String {
     caller.to_string()
+}
+
+#[ic_cdk::query(guard = "not_anonymous_caller")]
+pub fn check_collection_ownership(collection_id: Principal, owner: Principal) -> bool {
+    match get_collections().get(&collection_id) {
+        Some(value) => {
+            if value.to_string() == owner.to_string() {
+                return true;
+            }
+            false
+        }
+        _ => false,
+    }
 }
 
 export_candid!();
