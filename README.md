@@ -1,11 +1,13 @@
-# Icrc7 NFTs management
+# StakeShare
+
+Stakeshare is an application designed to facilitate the management of participation shares in various initiatives, leveraging blockchain notarization to ensure transparency and security. Developed in Rust and compiled into WebAssembly, Stakeshare runs on the Internet Computer Protocol (ICP). This solution enables users to digitally and decentrally register and exchange ownership or participation shares, with legal certification through the NFT standard (ICRC7). By utilizing smart contracts, Stakeshare automates agreements between parties and the distribution of proceeds, making the process of managing shares simpler, safer, and compliant with regulations.
 
 In this project you can find:
-- An implementation of the Icrc7 standard
-- A factory to create Icrc7 token collection
+- An implementation of the `Icrc7` standard
+- A `factory`ß to create Icrc7 token collection
 - A basic backend dapp to play with this kind of token
 
-The backend dapp is named StakeShare, it allows a user (previous login with internet identity) to create a group, identified by a uuid4 with a leader, a name and some members in it. 
+The backend allows a user (previous login with internet identity) to create a group, identified by a uuid4 with a leader, a name and some members in it. 
 Members are basically users, with a name and an internet identity.
 When a group is created a partecipation token is assigned to the group leader and the group members, this ownership of those tokens is assigned at the application, and for the user is not tradable/transferrable.
 Events represent a generic in-real-life event, with an ID (still uuid4), a name and a description.
@@ -21,11 +23,18 @@ Follows the table with the possible result code:
 | 404  | The resource could not be find |
 | 499  | Error while minting the NFT |
 
+
+## Prerequisites
+- `Rust`
+- `NodeJs`
+- `dfx`
+
+
 If you want to start working on your project right away, you might want to try the following commands:
 
 ```bash
 # TODO
-cd <project_mname>/
+cd stakeshare/
 dfx help
 dfx canister --help
 ```
