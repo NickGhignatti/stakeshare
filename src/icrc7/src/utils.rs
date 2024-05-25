@@ -4,12 +4,12 @@ use icrc_ledger_types::icrc1::account::{Account, Subaccount, DEFAULT_SUBACCOUNT}
 use crate::ext_types::User;
 
 pub fn account_transformer(account: Account) -> Account {
-    if let Some(_) = account.subaccount {
+    if account.subaccount.is_some() {
         account
     } else {
         Account {
             owner: account.owner,
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         }
     }
 }
@@ -19,15 +19,15 @@ pub fn user_transformer(user: User) -> Option<Account> {
         User::Address(_) => None,
         User::Principal(p) => Some(Account {
             owner: p,
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         }),
     }
 }
 
 pub fn default_account(owner: &Principal) -> Account {
     Account {
-        owner: owner.clone(),
-        subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+        owner: *owner,
+        subaccount: Some(*DEFAULT_SUBACCOUNT),
     }
 }
 

@@ -80,12 +80,10 @@ impl Icrc7Token {
 
     fn approval_check(&self, current_time: u64, account: &Account) -> bool {
         for approval in self.approvals.iter() {
-            if approval.account == *account {
-                if approval.expires_at.is_none() {
-                    return true;
-                } else if approval.expires_at >= Some(current_time) {
-                    return true;
-                }
+            if approval.account == *account
+                && (approval.expires_at.is_none() || approval.expires_at >= Some(current_time))
+            {
+                return true;
             }
         }
         false
@@ -181,8 +179,8 @@ impl State {
     pub const DEFAULT_TAKE_VALUE: u128 = 32;
     pub const DEFAULT_MAX_TAKE_VALUE: u128 = 32;
     pub const DEFAULT_MAX_MEMO_SIZE: u128 = 32;
-    pub const DEFAULT_TX_WINDOW: u64 = 24 * 60 * 60 * 1000_000_000;
-    pub const DEFAULT_PERMITTED_DRIFT: u64 = 2 * 60 * 1000_000_000;
+    pub const DEFAULT_TX_WINDOW: u64 = 24 * 60 * 60 * 1_000_000_000;
+    pub const DEFAULT_PERMITTED_DRIFT: u64 = 2 * 60 * 1_000_000_000;
 
     pub fn icrc7_symbol(&self) -> String {
         self.icrc7_symbol.clone()
@@ -209,7 +207,7 @@ impl State {
     }
 
     pub fn icrc7_minting_authority(&self) -> Option<Account> {
-        self.minting_authority.clone()
+        self.minting_authority
     }
 
     pub fn icrc7_max_query_batch_size(&self) -> Option<u128> {
@@ -256,7 +254,7 @@ impl State {
 
     pub fn set_sync_pending_txn_ids(&mut self, txn_ids: Option<Vec<u128>>) -> bool {
         self.sync_pending_txn_ids = txn_ids;
-        return true;
+        true
     }
 
     fn txn_deduplication_check(
@@ -341,13 +339,13 @@ impl State {
                 return Err(TransferError::TooOld);
             } else if time > allowed_future_time {
                 return Err(TransferError::CreatedInFuture {
-                    ledger_time: current_time.clone(),
+                    ledger_time: *current_time,
                 });
             }
             self.txn_deduplication_check(&allowed_past_time, caller, arg)?;
         }
         // checking is token for the corresponding ID exists or not
-        if let None = self.tokens.get(&arg.token_id) {
+        if self.tokens.get(&arg.token_id).is_none() {
             return Err(TransferError::NonExistingTokenId);
         }
         if let Some(ref memo) = arg.memo {
@@ -367,7 +365,7 @@ impl State {
         }
         let token = self.tokens.get(&arg.token_id).unwrap();
         // checking if the caller is authorized or is approve to make transaction
-        if token.token_owner != *caller && !token.approval_check(current_time.clone(), caller) {
+        if token.token_owner != *caller && !token.approval_check(*current_time, caller) {
             return Err(TransferError::Unauthorized);
         }
         Ok(())
@@ -379,7 +377,7 @@ impl State {
         mut args: Vec<TransferArg>,
     ) -> Vec<Option<TransferResult>> {
         // checking if the argument length in 0
-        if args.len() == 0 {
+        if args.is_empty() {
             return vec![Some(Err(TransferError::GenericBatchError {
                 error_code: 1,
                 message: "No Arguments Provided".into(),
@@ -406,11 +404,11 @@ impl State {
         let current_time = ic_cdk::api::time();
         for (index, arg) in args.iter_mut().enumerate() {
             let caller_account = account_transformer(Account {
-                owner: caller.clone(),
+                owner: *caller,
                 subaccount: arg.from_subaccount,
             });
             arg.to = account_transformer(arg.to);
-            if let Err(e) = self.mock_transfer(&current_time, &caller_account, &arg) {
+            if let Err(e) = self.mock_transfer(&current_time, &caller_account, arg) {
                 txn_results[index] = Some(Err(e));
             }
         }
@@ -424,7 +422,7 @@ impl State {
         }
         for (index, arg) in args.iter().enumerate() {
             let caller_account = account_transformer(Account {
-                owner: caller.clone(),
+                owner: *caller,
                 subaccount: arg.from_subaccount,
             });
             let time = arg.created_at_time.unwrap_or(current_time);
@@ -438,14 +436,14 @@ impl State {
                 }
             }
             let mut token = self.tokens.get(&arg.token_id).unwrap();
-            token.transfer(arg.to.clone());
+            token.transfer(arg.to);
             token.approvals.clear();
             self.tokens.insert(arg.token_id, token);
             let txn_id = self.log_transaction(
                 TransactionType::Transfer {
                     tid: arg.token_id,
-                    from: caller_account.clone(),
-                    to: arg.to.clone(),
+                    from: caller_account,
+                    to: arg.to,
                 },
                 time,
                 arg.memo.clone(),
@@ -461,7 +459,7 @@ impl State {
                 return Err(MintError::SupplyCapReached);
             }
         }
-        if let None = self.minting_authority {
+        if self.minting_authority.is_none() {
             return Err(MintError::GenericBatchError {
                 error_code: 6,
                 message: "Minting Authority Not Set".into(),
@@ -481,10 +479,10 @@ impl State {
                 });
             }
         }
-        if &arg.token_id < &self.next_token_id {
+        if arg.token_id < self.next_token_id {
             return Err(MintError::TokenIdMinimumLimit);
         }
-        if let Some(_) = self.tokens.get(&arg.token_id) {
+        if self.tokens.get(&arg.token_id).is_some() {
             return Err(MintError::TokenIdAlreadyExist);
         }
         Ok(())
@@ -492,7 +490,7 @@ impl State {
 
     pub fn mint(&mut self, caller: &Principal, mut arg: MintArg) -> MintResult {
         let caller = account_transformer(Account {
-            owner: caller.clone(),
+            owner: *caller,
             subaccount: arg.from_subaccount,
         });
         arg.to = account_transformer(arg.to);
@@ -506,7 +504,7 @@ impl State {
             token_name.clone(),
             arg.token_description.clone(),
             arg.token_logo,
-            arg.to.clone(),
+            arg.to,
         );
         self.tokens.insert(arg.token_id, token);
         self.next_token_id = arg.token_id + 1;
@@ -547,7 +545,7 @@ impl State {
     }
 
     pub fn burn(&mut self, caller: &Principal, mut args: Vec<BurnArg>) -> Vec<Option<BurnResult>> {
-        if args.len() == 0 {
+        if args.is_empty() {
             return vec![Some(Err(BurnError::GenericBatchError {
                 error_code: 1,
                 message: "No Arguments Provided".into(),
@@ -563,7 +561,7 @@ impl State {
         }
         for (index, arg) in args.iter_mut().enumerate() {
             let caller = account_transformer(Account {
-                owner: caller.clone(),
+                owner: *caller,
                 subaccount: arg.from_subaccount,
             });
             if let Err(e) = self.mock_burn(&caller, arg) {
@@ -580,7 +578,7 @@ impl State {
         }
         for (index, arg) in args.iter().enumerate() {
             let caller = account_transformer(Account {
-                owner: caller.clone(),
+                owner: *caller,
                 subaccount: arg.from_subaccount,
             });
             let burn_address = burn_account();
@@ -594,7 +592,7 @@ impl State {
                 }
             }
             let mut token = self.tokens.get(&arg.token_id).unwrap();
-            token.burn(burn_address.clone());
+            token.burn(burn_address);
             let tid = self.log_transaction(
                 TransactionType::Burn {
                     tid: arg.token_id,
@@ -642,7 +640,7 @@ impl State {
         caller: &Principal,
         mut args: Vec<ApprovalArg>,
     ) -> Vec<Option<ApproveResult>> {
-        if args.len() == 0 {
+        if args.is_empty() {
             return vec![Some(Err(ApprovalError::GenericBatchError {
                 error_code: 1,
                 message: "No Arguments Provided".into(),
@@ -658,7 +656,7 @@ impl State {
         }
         for (index, arg) in args.iter_mut().enumerate() {
             let caller = account_transformer(Account {
-                owner: caller.clone(),
+                owner: *caller,
                 subaccount: arg.from_subaccount,
             });
             if let Err(e) = self.mock_approve(&caller, arg) {
@@ -675,7 +673,7 @@ impl State {
         }
         for (index, arg) in args.iter().enumerate() {
             let caller = account_transformer(Account {
-                owner: caller.clone(),
+                owner: *caller,
                 subaccount: arg.from_subaccount,
             });
             if let Some(Err(e)) = txn_results.get(index).unwrap() {
@@ -693,7 +691,7 @@ impl State {
                 expires_at: arg.expires_at,
             };
             token.approve(approve_arg);
-            self.tokens.insert(arg.clone().token_id, token);
+            self.tokens.insert((*arg).clone().token_id, token);
             let tid = self.log_transaction(
                 TransactionType::Approval {
                     tid: arg.token_id,
@@ -750,7 +748,7 @@ impl State {
                 None => vec![],
                 Some(index) => list
                     .iter()
-                    .map(|id| *id)
+                    .copied()
                     .skip(index)
                     .take(take as usize)
                     .collect(),
@@ -782,7 +780,7 @@ impl State {
                 None => vec![],
                 Some(index) => owned_tokens
                     .iter()
-                    .map(|id| *id)
+                    .copied()
                     .skip(index)
                     .take(take as usize)
                     .collect(),
@@ -823,26 +821,24 @@ impl State {
         }
         self.sync_pending_txn_ids = None;
         self.archive_txn_count += txn_ids.len() as u128;
-        return true;
+        true
     }
 
     fn get_mapping_account(&self, user: &User) -> Option<Account> {
         match user {
             User::Principal(principal) => {
                 let account = default_account(principal);
-                return Some(account);
+                Some(account)
             }
             User::Address(address) => {
-                let pid = self.ext_account_mapping.get(&address);
+                let pid = self.ext_account_mapping.get(address);
                 match pid {
                     Some(pid) => {
                         let user_principal = Principal::from_text(pid).unwrap();
                         let account = default_account(&user_principal);
-                        return Some(account);
+                        Some(account)
                     }
-                    None => {
-                        return None;
-                    }
+                    None => None,
                 }
             }
         }
@@ -863,8 +859,8 @@ impl State {
         let canister_id = ic_cdk::api::id();
 
         let caller_account = account_transformer(Account {
-            owner: caller.clone(),
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            owner: *caller,
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         });
 
         let _from_account = match user_transformer(arg.from) {
@@ -893,28 +889,31 @@ impl State {
         };
 
         let icrc7_arg = TransferArg {
-            from_subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            from_subaccount: Some(*DEFAULT_SUBACCOUNT),
             to: to_account,
             token_id,
             memo: Some(arg.memo.clone()),
             created_at_time: Some(current_time),
         };
 
-        if let Err(_) = self.mock_transfer(&current_time, &caller_account, &icrc7_arg) {
+        if self
+            .mock_transfer(&current_time, &caller_account, &icrc7_arg)
+            .is_err()
+        {
             return ExtTransferResult::Err(ExtTransferError::Other(
                 "mock_transfer error".to_string(),
             ));
         }
 
         let mut token = self.tokens.get(&icrc7_arg.token_id).unwrap();
-        token.transfer(icrc7_arg.to.clone());
+        token.transfer(icrc7_arg.to);
         token.approvals.clear();
         self.tokens.insert(icrc7_arg.token_id, token);
         self.log_transaction(
             TransactionType::Transfer {
                 tid: icrc7_arg.token_id,
-                from: caller_account.clone(),
-                to: icrc7_arg.to.clone(),
+                from: caller_account,
+                to: icrc7_arg.to,
             },
             current_time,
             Some(arg.memo.clone()),
@@ -935,13 +934,13 @@ impl State {
         let canister_id = ic_cdk::api::id();
 
         let caller_account = account_transformer(Account {
-            owner: caller.clone(),
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            owner: *caller,
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         });
 
         let to_account = Account {
-            owner: arg.spender.clone(),
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            owner: arg.spender,
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         };
 
         let token_id = match arg.token.parse_token_index(canister_id) {
@@ -957,7 +956,7 @@ impl State {
             memo: None,
         };
 
-        if let Err(_) = self.mock_approve(&caller_account, &icrc7_arg) {
+        if self.mock_approve(&caller_account, &icrc7_arg).is_err() {
             return false;
         }
 
@@ -967,7 +966,7 @@ impl State {
             expires_at: None,
         };
         token.approve(approve_arg);
-        self.tokens.insert(token_id.clone(), token);
+        self.tokens.insert(token_id, token);
 
         self.log_transaction(
             TransactionType::Approval {
@@ -1006,7 +1005,7 @@ impl State {
             }
         }
 
-        return ExtBalanceResult::Err(ExtCommonError::InvalidToken(arg.token));
+        ExtBalanceResult::Err(ExtCommonError::InvalidToken(arg.token))
     }
 
     pub fn ext_allowance(&self, arg: ExtAllowanceArg) -> ExtAllowanceResult {
@@ -1028,8 +1027,8 @@ impl State {
         };
 
         let to_account = Account {
-            owner: arg.spender.clone(),
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            owner: arg.spender,
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         };
 
         let token = self.tokens.get(&token_id).unwrap();
@@ -1038,9 +1037,9 @@ impl State {
         }
 
         if token.approval_check(current_time, &to_account) {
-            return ExtAllowanceResult::Ok(1);
+            ExtAllowanceResult::Ok(1)
         } else {
-            return ExtAllowanceResult::Ok(0);
+            ExtAllowanceResult::Ok(0)
         }
     }
 
@@ -1055,15 +1054,15 @@ impl State {
         let token = self.tokens.get(&token_id);
 
         if let Some(token_info) = token {
-            return ExtBearerResult::Ok(
+            ExtBearerResult::Ok(
                 AccountIdentifier::from_principal(
                     &token_info.token_owner.owner,
                     &token_info.token_owner.subaccount,
                 )
                 .to_hex(),
-            );
+            )
         } else {
-            return ExtBearerResult::Err(ExtCommonError::Other("Invalid token".to_string()));
+            ExtBearerResult::Err(ExtCommonError::Other("Invalid token".to_string()))
         }
     }
 
@@ -1082,9 +1081,9 @@ impl State {
                 .token_description
                 .unwrap_or_else(|| String::from(""));
 
-            return ExtMetadataResult::Ok(ExtMetadata::Nonfungible(ExtMetadataType::new(metadata)));
+            ExtMetadataResult::Ok(ExtMetadata::Nonfungible(ExtMetadataType::new(metadata)))
         } else {
-            return ExtMetadataResult::Err(ExtCommonError::Other("Invalid token".to_string()));
+            ExtMetadataResult::Err(ExtCommonError::Other("Invalid token".to_string()))
         }
     }
 
@@ -1101,9 +1100,9 @@ impl State {
         if let Some(mut token_info) = token {
             token_info.token_description = Some(description);
             self.tokens.insert(token_id, token_info);
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 
@@ -1121,8 +1120,8 @@ impl State {
 
     pub fn ext_mint(&mut self, caller: &Principal, ext_arg: ExtMintArg) -> ExtTokenIndex {
         let caller = account_transformer(Account {
-            owner: caller.clone(),
-            subaccount: Some(DEFAULT_SUBACCOUNT.clone()),
+            owner: *caller,
+            subaccount: Some(*DEFAULT_SUBACCOUNT),
         });
 
         let to_account = match user_transformer(ext_arg.to) {
@@ -1162,7 +1161,7 @@ impl State {
             token_name.clone(),
             arg.token_description.clone(),
             arg.token_logo,
-            arg.to.clone(),
+            arg.to,
         );
         self.tokens.insert(arg.token_id, token);
         self.next_token_id = arg.token_id + 1;
@@ -1175,7 +1174,7 @@ impl State {
             ic_cdk::api::time(),
             arg.memo,
         );
-        return arg.token_id as u32;
+        arg.token_id as u32
     }
 
     pub fn ext_batch_mint(
@@ -1188,7 +1187,7 @@ impl State {
             let token_id = self.ext_mint(caller, ext_arg);
             token_ids.push(token_id);
         }
-        return token_ids;
+        token_ids
     }
 
     pub fn ext_supply(&self) -> ExtSupplyResult {
@@ -1200,7 +1199,7 @@ impl State {
         token_indexs: Vec<ExtTokenIndex>,
     ) -> Vec<(ExtTokenIndex, ExtMetadata)> {
         let mut token_list = vec![];
-        if token_indexs.len() > 0 {
+        if !token_indexs.is_empty() {
             self.tokens.iter().for_each(|(id, ref token)| {
                 if token_indexs.contains(&(id as u32)) {
                     let metadata = token
@@ -1240,7 +1239,7 @@ impl State {
     ) -> Option<AccountIdentifierHex> {
         let pid = caller.to_string();
         self.ext_account_mapping.insert(address.clone(), pid);
-        return Some(address);
+        Some(address)
     }
 }
 

@@ -19,6 +19,7 @@ pub async fn assign_nft_to_group_member(uuid: String) -> RequestResult<Vec<u128>
     };
     dotenv().ok();
     // getting the factory canister principal to create the collection
+    #[allow(clippy::option_env_unwrap)]
     let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );

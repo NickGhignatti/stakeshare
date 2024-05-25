@@ -48,7 +48,7 @@ pub async fn subscribe_group(
     insert_collection(
         group_id.clone(),
         Group {
-            group_name: group_name,
+            group_name,
             group_leader: Account {
                 owner: caller(),
                 subaccount: None,

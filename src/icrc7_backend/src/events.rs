@@ -24,8 +24,8 @@ pub fn create_event(name: String, description: String, metadata: MetadataValue) 
     insert_event_in_collection(Event {
         id: uuidv4(),
         title: name,
-        description: description,
-        metadata: metadata,
+        description,
+        metadata,
     });
 }
 
@@ -42,9 +42,7 @@ pub fn get_all_events() -> RequestResult<Vec<Event>> {
     RequestResult::new(
         200,
         "All events".to_string(),
-        get_events_collection()
-            .iter()
-            .map(|(_k, v)| v.clone())
+        get_events_collection().values().cloned()
             .collect(),
     )
 }

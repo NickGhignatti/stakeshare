@@ -44,7 +44,7 @@ pub fn ext_set_account_mapping() -> Option<AccountIdentifierHex> {
     if caller == Principal::anonymous() {
         return None;
     }
-    let account_id = AccountIdentifier::from_principal(&caller, &Some(DEFAULT_SUBACCOUNT.clone()));
+    let account_id = AccountIdentifier::from_principal(&caller, &Some(*DEFAULT_SUBACCOUNT));
     STATE.with(|s| {
         s.borrow_mut()
             .ext_set_account_mapping(&caller, account_id.to_hex())

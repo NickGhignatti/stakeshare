@@ -13,7 +13,7 @@ pub struct Group {
 }
 
 impl Group {
-    pub fn default() -> Group {
+    pub fn empty() -> Group {
         Group {
             group_name: String::new(),
             group_leader: Account::empty(),
@@ -76,7 +76,7 @@ pub struct Event {
 }
 
 impl Event {
-    pub fn default() -> Event {
+    pub fn empty() -> Event {
         Event {
             id: String::new(),
             title: String::new(),
@@ -191,9 +191,9 @@ pub struct RequestResult<T> {
 impl<T> RequestResult<T> {
     pub fn new(code: u16, message: String, body: T) -> RequestResult<T> {
         RequestResult {
-            code: code,
-            message: message,
-            body: body,
+            code,
+            message,
+            body,
         }
     }
 }

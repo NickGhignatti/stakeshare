@@ -23,7 +23,7 @@ async fn mint_collection_canister(arg: Arg, minting_account: Account) -> Result<
     let principal = match create_canister(
         CreateCanisterArgument {
             settings: Some(CanisterSettings {
-                controllers: Some(vec![ic_cdk::id(), account.clone().owner]),
+                controllers: Some(vec![ic_cdk::id(), account.owner]),
                 compute_allocation: None,
                 memory_allocation: None,
                 freezing_threshold: None,
@@ -48,7 +48,7 @@ async fn mint_collection_canister(arg: Arg, minting_account: Account) -> Result<
     .await
     {
         Ok(()) => {
-            insert_collection(account.owner.clone(), principal);
+            insert_collection(account.owner, principal);
             Ok(principal)
         }
         Err((code, msg)) => Err(format!("Code: {:?}, Message: {:?}", code, msg)),
@@ -65,7 +65,7 @@ pub fn get_user_collections(caller: Principal) -> Vec<Principal> {
     get_collections()
         .iter()
         .filter(|(_k, v)| *v.to_string() == *caller.to_string())
-        .map(|(k, _v)| (k.clone()))
+        .map(|(k, _v)| *k)
         .collect::<Vec<Principal>>()
 }
 
@@ -75,7 +75,7 @@ pub async fn update_minting_aythority(canister_id: Principal, owner: Principal) 
         canister_id,
         "icrc7_set_minting_authority",
         (Account {
-            owner: owner,
+            owner,
             subaccount: None,
         },),
     )
@@ -97,9 +97,9 @@ pub fn check_collection_ownership(collection_id: Principal, owner: Principal) ->
             if value.to_string() == owner.to_string() {
                 return true;
             }
-            return false;
+            false
         }
-        _ => return false,
+        _ => false,
     }
 }
 

@@ -41,11 +41,7 @@ pub fn remove_entry(group_id: &String) {
 pub fn get_group_by_id(group_id: String) -> RequestResult<Group> {
     match COLLECTIONS.with(|collection| collection.borrow().get(&group_id)) {
         Some(g) => RequestResult::new(200, format!("Correctly retrieved group {}", group_id), g),
-        _ => RequestResult::new(
-            404,
-            format!("Not found group {}", group_id),
-            Group::default(),
-        ),
+        _ => RequestResult::new(404, format!("Not found group {}", group_id), Group::empty()),
     }
 }
 
@@ -64,16 +60,12 @@ pub fn remove_event_from_collection(event_id: String) {
 pub fn get_event_by_id(event_id: String) -> RequestResult<Event> {
     match EVENT_COLLECTIONS.with(|collection| collection.borrow_mut().get(&event_id)) {
         Some(e) => RequestResult::new(200, format!("Correctly retrieved event {}", event_id), e),
-        _ => RequestResult::new(
-            404,
-            format!("Not found event {}", event_id),
-            Event::default(),
-        ),
+        _ => RequestResult::new(404, format!("Not found event {}", event_id), Event::empty()),
     }
 }
 
 pub fn get_current_token_id() -> u128 {
-    TOKEN_COUNTER.with(|token| token.borrow().get().clone())
+    TOKEN_COUNTER.with(|token| *token.borrow().get())
 }
 
 pub fn increase_token_id() {

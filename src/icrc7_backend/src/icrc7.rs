@@ -29,6 +29,7 @@ pub async fn get_user_tokens_collection() -> RequestResult<HashMap<u128, String>
     let caller = caller();
     dotenv().ok();
     let factory_canister_id = slice_to_principal(
+        #[allow(clippy::option_env_unwrap)]
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );
     let (icrc7_collections,): (Vec<Principal>,) =
@@ -90,25 +91,20 @@ pub async fn get_token_metadata(
             _ => (vec![],),
         };
     let mut resulting_metadata: Vec<MetadataValue> = vec![];
-    for metadata in token_metadatas {
-        match metadata {
-            Some(hash_map) => {
-                for (k, v) in hash_map {
-                    if k == "logo".to_string() {
-                        let logo_id = match get_icrc7_logo(collection_id).await.body {
-                            Some(path) => path,
-                            _ => String::new(),
-                        };
-                        let event = get_event_by_id(logo_id);
-                        if event.code == 200 {
-                            resulting_metadata.push(event.body.metadata)
-                        }
-                    } else {
-                        resulting_metadata.push(v)
-                    }
+    for metadata in token_metadatas.iter().flatten() {
+        for (k, v) in metadata {
+            if k == &("logo".to_string()) {
+                let logo_id = match get_icrc7_logo(collection_id).await.body {
+                    Some(path) => path,
+                    _ => String::new(),
+                };
+                let event = get_event_by_id(logo_id);
+                if event.code == 200 {
+                    resulting_metadata.push(event.body.metadata)
                 }
+            } else {
+                resulting_metadata.push(v.clone())
             }
-            _ => {}
         }
     }
     RequestResult::new(
@@ -130,6 +126,7 @@ pub async fn get_token_metadata(
 pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
     let caller = ic_cdk::caller();
     let factory_canister_id = slice_to_principal(
+        #[allow(clippy::option_env_unwrap)]
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );
     let (all_collections,): (HashMap<Principal, Principal>,) =
@@ -140,7 +137,7 @@ pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
     all_collections
         .iter()
         .filter(|(_k, v)| *v.to_string() == *caller.to_string())
-        .map(|(k, v)| (k.clone(), v.clone()))
+        .map(|(k, v)| (*k, *v))
         .collect::<HashMap<Principal, Principal>>()
 }
 
@@ -155,6 +152,7 @@ pub async fn get_user_icrc7_collections() -> HashMap<Principal, Principal> {
 #[ic_cdk::query(guard = "not_anonymous_caller", composite = true)]
 pub async fn get_all_icrc7_collections() -> HashMap<Principal, Principal> {
     let factory_canister_id = slice_to_principal(
+        #[allow(clippy::option_env_unwrap)]
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );
     let (all_collections,): (HashMap<Principal, Principal>,) =
@@ -164,6 +162,6 @@ pub async fn get_all_icrc7_collections() -> HashMap<Principal, Principal> {
         };
     all_collections
         .iter()
-        .map(|(k, v)| (k.clone(), v.clone()))
+        .map(|(k, v)| (*k, *v))
         .collect::<HashMap<Principal, Principal>>()
 }

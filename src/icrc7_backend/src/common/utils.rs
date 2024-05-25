@@ -34,10 +34,10 @@ pub async fn create_icrc7_collection(
         "mint_collection_canister",
         (
             Arg {
-                icrc7_symbol: format!("ICP"),
-                icrc7_name: icrc7_name,
-                icrc7_description: icrc7_description,
-                icrc7_logo: icrc7_logo,
+                icrc7_symbol: "ICP".to_string(),
+                icrc7_name,
+                icrc7_description,
+                icrc7_logo,
                 icrc7_supply_cap: None,
                 icrc7_max_query_batch_size: None,
                 icrc7_max_update_batch_size: None,
@@ -49,7 +49,7 @@ pub async fn create_icrc7_collection(
                 permitted_drift: None,
             },
             Account {
-                owner: owner,
+                owner,
                 subaccount: None,
             },
         ),
@@ -58,8 +58,8 @@ pub async fn create_icrc7_collection(
     .unwrap();
 
     match result {
-        Ok(val) => return val,
-        _ => return Principal::anonymous(),
+        Ok(val) => val,
+        _ => Principal::anonymous(),
     }
 }
 
@@ -73,7 +73,7 @@ pub async fn mint_icrc7_for_user(
     icrc7_logo: Option<String>,
 ) -> MintResult {
     let account = Account {
-        owner: owner,
+        owner,
         subaccount: None,
     };
     let (result,): (MintResult,) = call(

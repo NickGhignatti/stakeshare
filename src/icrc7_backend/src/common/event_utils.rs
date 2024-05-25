@@ -29,6 +29,7 @@ pub async fn assign_nft_for_event(
     };
     dotenv().ok();
     // getting the factory canister principal to create the collection, giving it to the user
+    #[allow(clippy::option_env_unwrap)]
     let factory_canister_id = slice_to_principal(
         option_env!("CANISTER_ID_FACTORY").expect("Env variable CANISTER_ID_FACTORY not found!"),
     );
@@ -40,7 +41,7 @@ pub async fn assign_nft_for_event(
         );
         let owner = string_to_principal(member.internet_identity.clone());
         let icrc7_canister_id = create_icrc7_collection(
-            owner.clone(),
+            owner,
             factory_canister_id,
             icrc7_name.clone(),
             icrc7_description.clone(),
@@ -48,9 +49,9 @@ pub async fn assign_nft_for_event(
         )
         .await;
         // updating minting authority, default is on the factory canister
-        update_minting_authority(factory_canister_id, owner.clone(), icrc7_canister_id).await;
+        update_minting_authority(factory_canister_id, owner, icrc7_canister_id).await;
         match mint_icrc7_for_user(
-            owner.clone(),
+            owner,
             icrc7_canister_id,
             Some(icrc7_name),
             icrc7_description.clone(),

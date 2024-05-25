@@ -16,7 +16,7 @@ mod tests {
         use std::fs::write;
         use std::path::PathBuf;
 
-        let dir = PathBuf::from(env::current_dir().unwrap());
+        let dir = env::current_dir().unwrap();
         write(dir.join("icrc7.did"), export_candid()).expect("Write failed.");
     }
 }
