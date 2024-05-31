@@ -2,14 +2,14 @@ use candid::Principal;
 
 use crate::{
     errors::InsertTransactionError,
-    guards::owner_guard,
+    guards::{not_anonymous_caller, owner_guard},
     state::{call_sync_logs, STATE},
     ApprovalArg, ApproveResult, BurnArg, BurnResult, MintArg, MintResult, SyncReceipt, Transaction,
     TransferArg, TransferResult,
 };
 use icrc_ledger_types::icrc1::account::Account;
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn icrc7_mint(arg: MintArg, caller: Principal) -> MintResult {
     // let caller = ic_cdk::caller();
     if caller == Principal::anonymous() {
@@ -21,19 +21,19 @@ pub fn icrc7_mint(arg: MintArg, caller: Principal) -> MintResult {
     STATE.with(|s| s.borrow_mut().mint(&caller, arg))
 }
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn icrc7_transfer(args: Vec<TransferArg>, caller: Principal) -> Vec<Option<TransferResult>> {
     // let caller = ic_cdk::caller();
     STATE.with(|s| s.borrow_mut().icrc7_transfer(&caller, args))
 }
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn icrc7_burn(args: Vec<BurnArg>) -> Vec<Option<BurnResult>> {
     let caller = ic_cdk::caller();
     STATE.with(|s| s.borrow_mut().burn(&caller, args))
 }
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anonymous_caller")]
 pub fn icrc7_approve(args: Vec<ApprovalArg>) -> Vec<Option<ApproveResult>> {
     let caller = ic_cdk::caller();
     STATE.with(|s| s.borrow_mut().approve(&caller, args))

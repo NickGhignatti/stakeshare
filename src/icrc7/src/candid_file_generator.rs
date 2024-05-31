@@ -14,7 +14,6 @@ mod tests {
     fn save_candid() {
         use std::env;
         use std::fs::write;
-        use std::path::PathBuf;
 
         let dir = env::current_dir().unwrap();
         write(dir.join("icrc7.did"), export_candid()).expect("Write failed.");
